@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:OnlyGodknow@34.126.133.68:3306/classhere"
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  password String
+}
+
+model Classroom {
+  id                 Int       @id @default(autoincrement())
+  name               String    @unique
+  number_of_students Int       @default(0)
+  created_at         DateTime  @default(now())
+  Student            Student[]
+  QRQuota            qrcode_quota[]
+}
+
+model Student {
+  id           Int       @id @default(autoincrement())
+  name         String
+  no           String    
+  checkin_status Boolean   @default(false)
+  classroom_id Int
+  created_at   DateTime  @default(now())
+  Classroom    Classroom @relation(fields: [classroom_id], references: [id], onDelete: Cascade)
+}
+
+model qrcode_quota {
+  id           Int       @id @default(autoincrement())
+  classroom_id Int       @unique
+  quota        Int
+  created_at   DateTime  @default(now())
+  Classroom    Classroom @relation(fields: [classroom_id], references: [id], onDelete: Cascade)
+}
