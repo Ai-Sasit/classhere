@@ -47,7 +47,7 @@
 import Vue from "vue";
 import jwt_decode from "jwt-decode";
 import dayjs from "dayjs";
-import { api } from "@/configs/api";
+import { api, Toast } from "@/configs/api";
 import Swal from "sweetalert2";
 
 interface Payload {
@@ -85,16 +85,24 @@ export default Vue.extend({
         no: this.no,
         classroom_id: decoded.classroom_id,
       };
-      api.post("/checkin", payload).then(() => {
-        Swal.fire({
-          title: "Success",
-          text: "Check in success",
-          icon: "success",
-          confirmButtonText: "OK",
-        }).then(() => {
-          window.location.href = "https://www.google.com";
+      api
+        .post("/checkin", payload)
+        .then(() => {
+          Swal.fire({
+            title: "Success",
+            text: "Check in success",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then(() => {
+            window.location.href = "https://www.google.com";
+          });
+        })
+        .catch(() => {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong!",
+          });
         });
-      });
     },
   },
 });

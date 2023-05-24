@@ -146,6 +146,7 @@
 import AppBar from "@/components/AppBar.vue";
 import swal from "sweetalert2";
 import { api } from "@/configs/api";
+import { Toast } from "@/configs/api";
 import Vue from "vue";
 
 interface studentList {
@@ -176,18 +177,27 @@ export default Vue.extend({
         number_of_students: this.studentList.length,
         students: this.studentList,
       };
-      api.post("/classroom", data).then(() => {
-        this.saving = false;
-        swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Classroom created successfully",
-          timer: 1500,
-          timerProgressBar: true,
-          showConfirmButton: false,
+      api
+        .post("/classroom", data)
+        .then(() => {
+          this.saving = false;
+          swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Classroom created successfully",
+            timer: 1500,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          this.$router.push("/");
+        })
+        .catch(() => {
+          this.saving = false;
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong",
+          });
         });
-        this.$router.push("/");
-      });
     },
   },
   data() {

@@ -198,15 +198,26 @@
 <script>
 import AppBar from "@/components/AppBar.vue";
 import Countdown from "@/components/Countdown.vue";
-import { api } from "@/configs/api";
+import { api, Toast } from "@/configs/api";
 import sign from "jwt-encode";
 import dayjs from "dayjs";
 import Vue from "vue";
 export default Vue.extend({
   components: { AppBar, Countdown },
   mounted() {
-    api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
-      this.studentList = res.data;
+    api
+      .get(`/students?class_id=${this.$route.params.id}`)
+      .then((res) => {
+        this.studentList = res.data;
+      })
+      .catch(() => {
+        Toast.fire({
+          icon: "error",
+          title: "Something went wrong!",
+        });
+      });
+    api.delete(`/qr/${this.$route.params.id}`).catch(() => {
+      console.log("error");
     });
   },
   data() {
@@ -226,9 +237,17 @@ export default Vue.extend({
   watch: {
     tab(newValue) {
       if (newValue == 1) {
-        api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
-          this.studentList = res.data;
-        });
+        api
+          .get(`/students?class_id=${this.$route.params.id}`)
+          .then((res) => {
+            this.studentList = res.data;
+          })
+          .catch(() => {
+            Toast.fire({
+              icon: "error",
+              title: "Something went wrong!",
+            });
+          });
       }
     },
   },
@@ -246,10 +265,17 @@ export default Vue.extend({
         expired_time: date,
         quota: this.quota,
       };
-      api.post("/qr", {
-        quota: this.quota,
-        classroom_id: this.$route.params.id,
-      });
+      api
+        .post("/qr", {
+          quota: this.quota,
+          classroom_id: this.$route.params.id,
+        })
+        .catch(() => {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong!",
+          });
+        });
       this.qr_data = `https://aiz-app-demo.web.app/student-submit/${sign(
         payload,
         "class"
@@ -278,9 +304,17 @@ export default Vue.extend({
     onStop() {
       this.minutes = 0;
       this.seconds = 0;
-      api.delete(`/qr/${this.$route.params.id}`).then(() => {
-        window.location.reload();
-      });
+      api
+        .delete(`/qr/${this.$route.params.id}`)
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(() => {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong!",
+          });
+        });
     },
     onFinished() {
       if (this.isLoop) {
@@ -288,7 +322,12 @@ export default Vue.extend({
       } else {
         this.minutes = 0;
         this.seconds = 0;
-        api.delete(`/qr/${this.$route.params.id}`);
+        api.delete(`/qr/${this.$route.params.id}`).catch(() => {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong!",
+          });
+        });
       }
     },
     onClickCheckIn(student_no) {
@@ -297,9 +336,17 @@ export default Vue.extend({
         no: student_no,
       };
       api.post("checkin", payload).then(() => {
-        api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
-          this.studentList = res.data;
-        });
+        api
+          .get(`/students?class_id=${this.$route.params.id}`)
+          .then((res) => {
+            this.studentList = res.data;
+          })
+          .catch(() => {
+            Toast.fire({
+              icon: "error",
+              title: "Something went wrong!",
+            });
+          });
       });
     },
     onClickCheckOut(student_no) {
@@ -307,11 +354,27 @@ export default Vue.extend({
         classroom_id: this.$route.params.id,
         no: student_no,
       };
-      api.post("checkout", payload).then(() => {
-        api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
-          this.studentList = res.data;
+      api
+        .post("checkout", payload)
+        .then(() => {
+          api
+            .get(`/students?class_id=${this.$route.params.id}`)
+            .then((res) => {
+              this.studentList = res.data;
+            })
+            .catch(() => {
+              Toast.fire({
+                icon: "error",
+                title: "Something went wrong!",
+              });
+            });
+        })
+        .catch(() => {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong!",
+          });
         });
-      });
     },
     goToStudent() {
       window.location.href = this.qr_data;

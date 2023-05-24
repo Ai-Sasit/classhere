@@ -41,11 +41,21 @@ module.exports.getQRcodeQuota = (req, res, next) => {
 
 module.exports.deleteQRcodeQuota = (req, res, next) => {
   const { id } = req.params;
-  prisma.qrcode_quota
-    .delete({
-      where: { classroom_id: Number(id) },
-    })
-    .then((qrcode_quota) => {
-      res.json(qrcode_quota);
+  if (!id) {
+    return res.status(400).json({
+      message: "Please provide classroom id",
     });
+  }
+  prisma.qrcode_quota.findFirst({ where: { classroom_id: Number(id) } }).then((qr)=>{
+    if(!qr){
+      return res.status(400).json({
+        message: "Classroom not found",
+      });
+    } else {
+      prisma.qrcode_quota.delete({ where: { classroom_id: Number(id) } }).then((qrcode_quota) => {
+        res.json(qrcode_quota);
+      });
+    }
+  })
+  
 };

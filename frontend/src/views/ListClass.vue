@@ -86,6 +86,7 @@
 <script lang="ts">
 import AppBar from "@/components/AppBar.vue";
 import { api } from "@/configs/api";
+import { Toast } from "@/configs/api";
 import swal from "sweetalert2";
 import dayjs from "dayjs";
 import Vue from "vue";
@@ -106,10 +107,19 @@ export default Vue.extend({
     };
   },
   mounted() {
-    api.get("/classrooms").then((res) => {
-      this.loading = false;
-      this.classrooms = res.data;
-    });
+    api
+      .get("/classrooms")
+      .then((res) => {
+        this.loading = false;
+        this.classrooms = res.data;
+      })
+      .catch(() => {
+        this.loading = false;
+        Toast.fire({
+          icon: "error",
+          title: "Something went wrong!",
+        });
+      });
   },
   data() {
     return {
@@ -132,15 +142,22 @@ export default Vue.extend({
         .then((result) => {
           if (result.isConfirmed) {
             api.delete(`/classroom/${id}`).then(() => {
-              swal.fire({
-                title: "Deleted!",
-                text: "Your classroom has been deleted.",
-                icon: "success",
-                timer: 1500,
-                focusConfirm: false,
-                showConfirmButton: false,
-                timerProgressBar: true,
-              });
+              swal
+                .fire({
+                  title: "Deleted!",
+                  text: "Your classroom has been deleted.",
+                  icon: "success",
+                  timer: 1500,
+                  focusConfirm: false,
+                  showConfirmButton: false,
+                  timerProgressBar: true,
+                })
+                .catch(() => {
+                  Toast.fire({
+                    icon: "error",
+                    title: "Something went wrong!",
+                  });
+                });
               this.classrooms = this.classrooms.filter(
                 (item) => item.id !== id
               );

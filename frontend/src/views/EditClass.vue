@@ -156,7 +156,7 @@
 <script lang="ts">
 import AppBar from "@/components/AppBar.vue";
 import swal from "sweetalert2";
-import { api } from "@/configs/api";
+import { api, Toast } from "@/configs/api";
 import Vue from "vue";
 
 interface studentList {
@@ -168,10 +168,20 @@ export default Vue.extend({
   name: "AddClassView",
   components: { AppBar },
   mounted() {
-    api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
-      this.loading = false;
-      this.studentList = res.data;
-    });
+    api
+      .get(`/students?class_id=${this.$route.params.id}`)
+      .then((res) => {
+        this.loading = false;
+        this.studentList = res.data;
+      })
+      .catch(() => {
+        this.loading = false;
+        Toast.fire({
+          icon: "error",
+          title: "Error",
+          text: "Something went wrong",
+        });
+      });
   },
   methods: {
     onAddStudent() {
@@ -193,18 +203,28 @@ export default Vue.extend({
         number_of_students: this.studentList.length,
         students: this.studentList,
       };
-      api.put(`/classroom/${this.$route.params.id}`, data).then(() => {
-        this.saving = false;
-        swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Classroom has been updated",
-          timer: 1500,
-          timerProgressBar: true,
-          showConfirmButton: false,
+      api
+        .put(`/classroom/${this.$route.params.id}`, data)
+        .then(() => {
+          this.saving = false;
+          swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Classroom has been updated",
+            timer: 1500,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          this.$router.push("/");
+        })
+        .catch(() => {
+          this.saving = false;
+          Toast.fire({
+            icon: "error",
+            title: "Error",
+            text: "Something went wrong",
+          });
         });
-        this.$router.push("/");
-      });
     },
   },
   data() {
