@@ -16,13 +16,15 @@ module.exports.getOneClassroom = function (req, res) {
 };
 
 module.exports.createClassroom = function (req, res) {
-  const { name, number_of_students, students } = req.body;
+  const { name, number_of_students, students, start, end } = req.body;
   console.log(req.body);
   prisma.classroom
     .create({
       data: {
         name,
         number_of_students: Number(number_of_students),
+        start_time: start,
+        end_time: end,
       },
     })
     .then((classroom) => {
@@ -48,13 +50,15 @@ module.exports.createClassroom = function (req, res) {
 
 module.exports.updateClassroom = function (req, res) {
   const { id } = req.params;
-  const { name, number_of_students, students } = req.body;
+  const { name, number_of_students, students, start, end } = req.body;
   prisma.classroom
     .update({
       where: { id: Number(id) },
       data: {
         name,
         number_of_students: Number(number_of_students),
+        start_time: start,
+        end_time: end,
       },
     })
     .then((classroom) => {

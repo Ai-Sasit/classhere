@@ -10,9 +10,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-
+import isBetween from "dayjs/plugin/isBetween";
+import dayjs from "dayjs";
 export default Vue.extend({
   name: "App",
+  setup() {
+    dayjs.extend(isBetween);
+  },
 });
 </script>
 <style>

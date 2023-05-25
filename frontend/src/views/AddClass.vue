@@ -31,7 +31,10 @@
       <v-row
         ><v-col
           ><v-card style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
-            ><v-row><v-col style="margin-left: 1rem">Name</v-col></v-row>
+            ><v-row
+              ><v-col cols="3" style="margin-left: 1rem">Name</v-col
+              ><v-col cols="3">Start</v-col><v-col cols="3">End</v-col></v-row
+            >
             <v-row style="margin-top: 0"
               ><v-col cols="3" style="margin-left: 1rem"
                 ><v-text-field
@@ -41,6 +44,67 @@
                   v-model="className"
                   placeholder="Enter Classroom Name"
                   dense></v-text-field></v-col
+              ><v-col cols="3"
+                ><v-menu
+                  ref="menuStart"
+                  v-model="menuTimeStart"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  :return-value.sync="startTime"
+                  transition="scale-transition"
+                  offset-y
+                  max-width="290px"
+                  min-width="290px">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="startTime"
+                      label="Start Time"
+                      outlined
+                      dense
+                      append-icon="mdi-clock-time-four-outline"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"></v-text-field>
+                  </template>
+                  <v-time-picker
+                    v-if="menuTimeStart"
+                    v-model="startTime"
+                    full-width
+                    color="orange darken-2"
+                    format="24hr"
+                    @click:minute="
+                      $refs.menuStart.save(startTime)
+                    "></v-time-picker> </v-menu></v-col
+              ><v-col cols="3">
+                <v-menu
+                  ref="menuEnd"
+                  v-model="menuTimeEnd"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  :return-value.sync="endTime"
+                  transition="scale-transition"
+                  offset-y
+                  max-width="290px"
+                  min-width="290px">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="endTime"
+                      label="End Time"
+                      outlined
+                      dense
+                      append-icon="mdi-clock-time-four-outline"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"></v-text-field>
+                  </template>
+                  <v-time-picker
+                    v-if="menuTimeEnd"
+                    v-model="endTime"
+                    color="orange darken-2"
+                    full-width
+                    format="24hr"
+                    @click:minute="$refs.menuEnd.save(endTime)"></v-time-picker>
+                </v-menu> </v-col
             ></v-row>
             <v-row>
               <v-col
@@ -64,13 +128,32 @@
               <template v-slot:default>
                 <thead>
                   <tr>
-                    <th class="text-left" style="font-size: medium">Name</th>
-                    <th class="text-left" style="font-size: medium">
+                    <th
+                      class="text-left"
+                      style="
+                        font-size: medium;
+                        background: #263238;
+                        color: white;
+                      ">
+                      Name
+                    </th>
+                    <th
+                      class="text-left"
+                      style="
+                        font-size: medium;
+                        background: #263238;
+                        color: white;
+                      ">
                       Student No.
                     </th>
                     <th
                       class="text-left"
-                      style="width: 5rem; font-size: medium">
+                      style="
+                        width: 10rem;
+                        font-size: medium;
+                        background: #263238;
+                        color: white;
+                      ">
                       Action
                     </th>
                   </tr>
@@ -159,13 +242,22 @@ export default Vue.extend({
   components: { AppBar },
   methods: {
     onAddStudent() {
-      this.dialog = false;
-      this.studentList.push({
-        name: this.studentName,
-        studentNo: this.studentNo,
-      });
-      this.studentName = "";
-      this.studentNo = "";
+      if (this.studentList.every((item) => item.studentNo !== this.studentNo)) {
+        this.dialog = false;
+        this.studentList.push({
+          name: this.studentName,
+          studentNo: this.studentNo,
+        });
+        this.studentName = "";
+        this.studentNo = "";
+      } else {
+        Toast.fire({
+          icon: "error",
+          position: "top",
+          title: "Student No. already exist",
+        });
+        this.studentNo = "";
+      }
     },
     onDeleteStudent(index: number) {
       this.studentList.splice(index, 1);
@@ -176,6 +268,8 @@ export default Vue.extend({
         name: this.className,
         number_of_students: this.studentList.length,
         students: this.studentList,
+        start: this.startTime,
+        end: this.endTime,
       };
       api
         .post("/classroom", data)
@@ -208,6 +302,10 @@ export default Vue.extend({
       studentNo: "",
       studentList: [] as studentList[],
       saving: false,
+      startTime: "",
+      endTime: "",
+      menuTimeStart: false,
+      menuTimeEnd: false,
     };
   },
 });

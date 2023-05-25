@@ -10,19 +10,23 @@
     <v-card
       class="mx-auto"
       elevation="2"
-      style="height: 300px; width: 90%; margin-top: 1.5rem"
-      ><br /><br /><br />
+      style="height: 88vh; width: 90%; margin-top: 1.5rem">
+      <v-divider style="margin-bottom: 30vh" />
       <div class="mx-4" v-if="allow">
-        <label>Student No.</label>
+        <h2 style="margin-bottom: 0.5rem">Student No.</h2>
         <v-text-field
           outlined
+          style="font-size: large"
           color="orange darken-2"
           v-model="no"
-          dense
           hide-details=""
           placeholder="Enter student number"></v-text-field>
         <div style="text-align: center; margin-top: 1.5rem">
-          <v-btn color="orange darken-2" style="color: white" @click="onSubmit"
+          <v-btn
+            color="orange darken-2"
+            style="color: white; font-size: large"
+            large
+            @click="onSubmit"
             >submit</v-btn
           >
         </div>

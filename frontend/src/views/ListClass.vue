@@ -22,12 +22,59 @@
             <template v-slot:default>
               <thead>
                 <tr>
-                  <th style="text-align: left; font-size: medium">Classroom</th>
-                  <th style="text-align: left; font-size: medium">Students</th>
-                  <th style="text-align: left; font-size: medium">Date</th>
-                  <th style="text-align: left; font-size: medium">TIme</th>
                   <th
-                    style="text-align: center; font-size: medium; width: 10rem">
+                    style="
+                      text-align: left;
+                      font-size: medium;
+                      background: #263238;
+                      color: white;
+                    ">
+                    Classroom
+                  </th>
+                  <th
+                    style="
+                      text-align: left;
+                      font-size: medium;
+                      background: #263238;
+                      color: white;
+                    ">
+                    Students
+                  </th>
+                  <th
+                    style="
+                      text-align: left;
+                      font-size: medium;
+                      background: #263238;
+                      color: white;
+                    ">
+                    Start
+                  </th>
+                  <th
+                    style="
+                      text-align: left;
+                      font-size: medium;
+                      background: #263238;
+                      color: white;
+                    ">
+                    End
+                  </th>
+                  <th
+                    style="
+                      text-align: left;
+                      font-size: medium;
+                      background: #263238;
+                      color: white;
+                    ">
+                    Ceated At
+                  </th>
+                  <th
+                    style="
+                      text-align: center;
+                      font-size: medium;
+                      background: #263238;
+                      color: white;
+                      width: 10rem;
+                    ">
                     Action
                   </th>
                 </tr>
@@ -36,10 +83,12 @@
                 <tr v-for="item in classrooms" :key="item.id">
                   <td>{{ item.name }}</td>
                   <td>{{ item.number_of_students }}</td>
+                  <td>{{ item.start_time }}</td>
+                  <td>{{ item.end_time }}</td>
                   <td>{{ dayjs(item.created_at).format("YYYY-MM-DD") }}</td>
-                  <td>{{ dayjs(item.created_at).format("HH:mm") }}</td>
                   <td style="text-align: center">
                     <v-btn
+                      v-if="isBetweenTime(item.start_time, item.end_time)"
                       icon
                       color="grey darken-3"
                       @click="
@@ -47,11 +96,25 @@
                       ">
                       <v-icon>mdi-eye</v-icon>
                     </v-btn>
+                    <v-tooltip bottom v-else>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          icon
+                          color="grey darken-3"
+                          v-on="on"
+                          v-bind="attrs">
+                          <v-icon>mdi-eye-off</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Classroom is not available</span>
+                    </v-tooltip>
                     <v-btn
                       icon
                       color="grey darken-3"
                       @click="
-                        $router.push(`/edit-class/${item.id}?name=${item.name}`)
+                        $router.push(
+                          `/edit-class/${item.id}?name=${item.name}&start=${item.start_time}&end=${item.end_time}`
+                        )
                       ">
                       <v-icon>mdi-layers-edit</v-icon>
                     </v-btn>
@@ -96,6 +159,8 @@ interface Classroom {
   name: string;
   number_of_students: number;
   created_at: string;
+  start_time: string;
+  end_time: string;
 }
 
 export default Vue.extend({
@@ -141,9 +206,10 @@ export default Vue.extend({
         })
         .then((result) => {
           if (result.isConfirmed) {
-            api.delete(`/classroom/${id}`).then(() => {
-              swal
-                .fire({
+            api
+              .delete(`/classroom/${id}`)
+              .then(() => {
+                swal.fire({
                   title: "Deleted!",
                   text: "Your classroom has been deleted.",
                   icon: "success",
@@ -151,20 +217,29 @@ export default Vue.extend({
                   focusConfirm: false,
                   showConfirmButton: false,
                   timerProgressBar: true,
-                })
-                .catch(() => {
-                  Toast.fire({
-                    icon: "error",
-                    title: "Something went wrong!",
-                  });
                 });
-              this.classrooms = this.classrooms.filter(
-                (item) => item.id !== id
-              );
-            });
+
+                this.classrooms = this.classrooms.filter(
+                  (item) => item.id !== id
+                );
+              })
+              .catch(() => {
+                Toast.fire({
+                  icon: "error",
+                  title: "Something went wrong!",
+                });
+              });
           }
         });
+    },
+    isBetweenTime(start: string, end: string) {
+      const now = dayjs();
+      const startTime = dayjs(`${now.format("YYYY-MM-DD")} ${start}`);
+      const endTime = dayjs(`${now.format("YYYY-MM-DD")} ${end}`);
+
+      return now.isBetween(startTime, endTime);
     },
   },
 });
 </script>
+<style></style>

@@ -88,13 +88,16 @@
                         v-model="time"
                         placeholder="Enter Expired Time (MM:SS)"
                         outlined
+                        color="orange darken-2"
+                        v-mask="'##:##'"
                         hide-details=""
                         dense
                         append-icon="mdi-clock-time-four-outline"></v-text-field> </v-col
                     ><v-col
                       ><v-text-field
                         v-model.number="quota"
-                        type="number"
+                        v-mask="'###'"
+                        color="orange darken-2"
                         dense
                         hide-details=""
                         append-icon="mdi-timer-sand"
@@ -136,59 +139,76 @@
         </v-tab-item>
         <v-tab-item key="Manaul">
           <v-card color="basil" flat>
-            <v-card-text
-              ><v-simple-table
-                style="margin-top: 1rem"
-                height="350px"
-                fixed-header>
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left" style="font-size: medium">Name</th>
-                      <th class="text-left" style="font-size: medium">
-                        Student No.
-                      </th>
-                      <th
-                        class="text-center"
-                        style="width: 10rem; font-size: medium">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="item in studentList" :key="item.name">
-                      <td>{{ item.name }}</td>
-                      <td>{{ item.no }}</td>
-                      <td v-if="!item.checkin_status">
-                        <v-btn
-                          color="orange darken-2"
-                          block
-                          @click="onClickCheckIn(item.no)"
-                          style="color: white">
-                          Check In
-                        </v-btn>
-                      </td>
-                      <td v-else>
-                        <v-tooltip right>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                              color="teal darken-2"
-                              text
-                              block
-                              v-bind="attrs"
-                              @click="onClickCheckOut(item.no)"
-                              v-on="on"
-                              >PRESENT</v-btn
-                            >
-                          </template>
-                          <span>Reset</span>
-                        </v-tooltip>
-                      </td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table></v-card-text
-            >
+            <v-simple-table
+              style="margin-top: 1rem"
+              height="400px"
+              fixed-header>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th
+                      class="text-left"
+                      style="
+                        font-size: medium;
+                        background: #263238;
+                        color: white;
+                      ">
+                      Name
+                    </th>
+                    <th
+                      class="text-left"
+                      style="
+                        font-size: medium;
+                        background: #263238;
+                        color: white;
+                      ">
+                      Student No.
+                    </th>
+                    <th
+                      class="text-center"
+                      style="
+                        width: 10rem;
+                        font-size: medium;
+                        background: #263238;
+                        color: white;
+                      ">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in studentList" :key="item.name">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.no }}</td>
+                    <td v-if="!item.checkin_status">
+                      <v-btn
+                        color="orange darken-2"
+                        block
+                        @click="onClickCheckIn(item.no)"
+                        style="color: white">
+                        Check In
+                      </v-btn>
+                    </td>
+                    <td v-else>
+                      <v-tooltip right>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn
+                            color="teal darken-2"
+                            text
+                            block
+                            v-bind="attrs"
+                            @click="onClickCheckOut(item.no)"
+                            v-on="on"
+                            >PRESENT</v-btn
+                          >
+                        </template>
+                        <span>Reset</span>
+                      </v-tooltip>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
           </v-card>
         </v-tab-item>
       </v-tabs-items>
@@ -201,9 +221,11 @@ import Countdown from "@/components/Countdown.vue";
 import { api, Toast } from "@/configs/api";
 import sign from "jwt-encode";
 import dayjs from "dayjs";
+import { mask } from "@titou10/v-mask";
 import Vue from "vue";
 export default Vue.extend({
   components: { AppBar, Countdown },
+  directives: { mask },
   mounted() {
     api
       .get(`/students?class_id=${this.$route.params.id}`)
@@ -227,11 +249,12 @@ export default Vue.extend({
       studentList: [],
       isLoop: false,
       time: "",
-      quota: 0,
+      quota: "",
       minutes: 0,
       seconds: 0,
       loopKey: 0,
       qr_data: "",
+      auto_status: 0,
     };
   },
   watch: {
@@ -253,33 +276,46 @@ export default Vue.extend({
   },
   methods: {
     onGenerate() {
-      const minuteAndSecond = this.time.split(":");
-      this.minutes = parseInt(minuteAndSecond[0]);
-      this.seconds = parseInt(minuteAndSecond[1]);
-      const date = dayjs(new Date())
-        .add(this.minutes, "minute")
-        .add(this.seconds, "second")
-        .format("YYYY-MM-DD HH:mm:ss");
-      const payload = {
-        classroom_id: this.$route.params.id,
-        expired_time: date,
-        quota: this.quota,
-      };
-      api
-        .post("/qr", {
-          quota: this.quota,
-          classroom_id: this.$route.params.id,
-        })
-        .catch(() => {
-          Toast.fire({
-            icon: "error",
-            title: "Something went wrong!",
-          });
+      if (this.time == "" || this.quota == "") {
+        Toast.fire({
+          icon: "error",
+          title: "Please fill in all the fields!",
         });
-      this.qr_data = `https://aiz-app-demo.web.app/student-submit/${sign(
-        payload,
-        "class"
-      )}`;
+      } else {
+        const minuteAndSecond = this.time.split(":");
+        this.minutes = parseInt(minuteAndSecond[0]);
+        this.seconds = parseInt(minuteAndSecond[1]);
+        const date = dayjs(new Date())
+          .add(this.minutes, "minute")
+          .add(this.seconds, "second")
+          .format("YYYY-MM-DD HH:mm:ss");
+        const payload = {
+          classroom_id: this.$route.params.id,
+          expired_time: date,
+          quota: this.quota,
+        };
+        api
+          .post("/qr", {
+            quota: this.quota,
+            classroom_id: this.$route.params.id,
+          })
+          .catch(() => {
+            Toast.fire({
+              icon: "error",
+              title: "Something went wrong!",
+            });
+          });
+        this.qr_data = `https://aiz-app-demo.web.app/student-submit/${sign(
+          payload,
+          "class"
+        )}`;
+        this.auto_status = setInterval(() => {
+          console.log("auto");
+          api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
+            this.studentList = res.data;
+          });
+        }, 1000);
+      }
     },
     onLoopGenerate() {
       this.isLoop = true;
@@ -304,6 +340,7 @@ export default Vue.extend({
     onStop() {
       this.minutes = 0;
       this.seconds = 0;
+      clearInterval(this.auto_status);
       api
         .delete(`/qr/${this.$route.params.id}`)
         .then(() => {
@@ -328,6 +365,7 @@ export default Vue.extend({
             title: "Something went wrong!",
           });
         });
+        clearInterval(this.auto_status);
       }
     },
     onClickCheckIn(student_no) {

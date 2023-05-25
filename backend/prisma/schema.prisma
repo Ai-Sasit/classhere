@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "---"
+  url      = "mysql://root:OnlyGodknow@34.126.133.68:3306/classhere"
 }
 
 model User {
@@ -19,6 +19,8 @@ model Classroom {
   name               String    @unique
   number_of_students Int       @default(0)
   created_at         DateTime  @default(now())
+  start_time         String
+  end_time           String
   Student            Student[]
   QRQuota            qrcode_quota[]
 }

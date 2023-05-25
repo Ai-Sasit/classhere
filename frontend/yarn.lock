@@ -1138,6 +1138,13 @@
   resolved "https://registry.yarnpkg.com/@soda/get-current-script/-/get-current-script-1.0.2.tgz#a53515db25d8038374381b73af20bb4f2e508d87"
   integrity sha512-T7VNNlYVM1SgQ+VsMYhnDkcGmWhQdL0bDyGm5TlQ3GBXnJscEClUUOKduWTmm2zCnvNLC1hc3JpuXjs/nFOc5w==
 
+"@titou10/v-mask@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@titou10/v-mask/-/v-mask-1.0.8.tgz#5b4dabc8ce9e4d648ff3fbc4c0cdd37d812f78ff"
+  integrity sha512-1jTTm80thy3rFKvY6jcSX24rMCqPXQjvAqIAX38gfo5MTlyrA+cuKpfrAOIEMc2z6XZc/ZKqx31RE8AzxDmjDw==
+  dependencies:
+    lodash "^4.17.21"
+
 "@trysound/sax@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
