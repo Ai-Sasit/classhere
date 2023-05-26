@@ -89,7 +89,13 @@
                         placeholder="Enter Expired Time (MM:SS)"
                         outlined
                         color="orange darken-2"
-                        v-mask="'##:##'"
+                        v-mask="{
+                          mask: '$#:$#',
+                          tokens: {
+                            $: { pattern: /[0-5]/ },
+                            '#': { pattern: /[0-9]/ },
+                          },
+                        }"
                         :error-messages="timeError"
                         dense
                         append-icon="mdi-clock-time-four-outline"></v-text-field> </v-col
@@ -260,12 +266,8 @@ export default Vue.extend({
     };
   },
   watch: {
-    time(newValue) {
-      if (/^([0-5][0-9]):([0-5][0-9])$/.test(newValue)) {
-        this.timeError = "";
-      } else {
-        this.timeError = "Invalid time format";
-      }
+    time() {
+      this.timeError = "";
     },
     quota() {
       this.quotaError = "";
