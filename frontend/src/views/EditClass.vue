@@ -207,7 +207,7 @@
             outlined
             v-model="studentNo"
             color="orange darken-2"
-            hide-details=""
+            :error-messages="stuNoError"
             placeholder="Enter Student No."
             dense></v-text-field>
         </v-card-text>
@@ -277,12 +277,7 @@ export default Vue.extend({
         this.studentName = "";
         this.studentNo = "";
       } else {
-        Toast.fire({
-          icon: "error",
-          position: "top",
-          title: "Student No. already exist",
-        });
-        this.studentNo = "";
+        this.stuNoError = "Student No. already exist";
       }
     },
     onDeleteStudent(index: number) {
@@ -334,6 +329,7 @@ export default Vue.extend({
       endTime: this.$route.query.end as string,
       menuTimeStart: false,
       menuTimeEnd: false,
+      stuNoError: "",
     };
   },
 });

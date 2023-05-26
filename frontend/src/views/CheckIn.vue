@@ -90,7 +90,7 @@
                         outlined
                         color="orange darken-2"
                         v-mask="'##:##'"
-                        hide-details=""
+                        :error-messages="timeError"
                         dense
                         append-icon="mdi-clock-time-four-outline"></v-text-field> </v-col
                     ><v-col
@@ -99,11 +99,11 @@
                         v-mask="'###'"
                         color="orange darken-2"
                         dense
-                        hide-details=""
+                        :error-messages="quotaError"
                         append-icon="mdi-timer-sand"
                         outlined
                         placeholder="Enter scanning quota"></v-text-field></v-col></v-row
-                  ><v-row
+                  ><v-row style="margin-top: -1rem"
                     ><v-col
                       ><v-btn
                         block
@@ -255,9 +255,21 @@ export default Vue.extend({
       loopKey: 0,
       qr_data: "",
       auto_status: 0,
+      timeError: "",
+      quotaError: "",
     };
   },
   watch: {
+    time(newValue) {
+      if (/^([0-5][0-9]):([0-5][0-9])$/.test(newValue)) {
+        this.timeError = "";
+      } else {
+        this.timeError = "Invalid time format";
+      }
+    },
+    quota() {
+      this.quotaError = "";
+    },
     tab(newValue) {
       if (newValue == 1) {
         api
@@ -276,12 +288,14 @@ export default Vue.extend({
   },
   methods: {
     onGenerate() {
-      if (this.time == "" || this.quota == "") {
-        Toast.fire({
-          icon: "error",
-          title: "Please fill in all the fields!",
-        });
-      } else {
+      if (this.time == "" && this.quota == "") {
+        this.timeError = "Please enter time";
+        this.quotaError = "Please enter quota";
+      } else if (this.time == "") {
+        this.timeError = "Please enter time";
+      } else if (this.quota == "") {
+        this.quotaError = "Please enter quota";
+      } else if (this.timeError !== "Invalid time format") {
         const minuteAndSecond = this.time.split(":");
         this.minutes = parseInt(minuteAndSecond[0]);
         this.seconds = parseInt(minuteAndSecond[1]);

@@ -233,11 +233,21 @@ export default Vue.extend({
         });
     },
     isBetweenTime(start: string, end: string) {
+      const hr1 = parseInt(start.split(":")[0]);
+      const hr2 = parseInt(end.split(":")[0]);
       const now = dayjs();
-      const startTime = dayjs(`${now.format("YYYY-MM-DD")} ${start}`);
-      const endTime = dayjs(`${now.format("YYYY-MM-DD")} ${end}`);
-
-      return now.isBetween(startTime, endTime);
+      const date = now.format("YYYY-MM-DD");
+      if (hr1 > hr2) {
+        const startTime = dayjs(
+          `${now.subtract(1, "day").format("YYYY-MM-DD")} ${start}`
+        );
+        const endTime = dayjs(`${date} ${end}`);
+        return now.isBetween(startTime, endTime);
+      } else {
+        const startTime = dayjs(`${date} ${start}`);
+        const endTime = dayjs(`${date} ${end}`);
+        return now.isBetween(startTime, endTime);
+      }
     },
   },
 });

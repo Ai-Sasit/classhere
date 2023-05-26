@@ -206,8 +206,8 @@
           <v-text-field
             outlined
             v-model="studentNo"
+            :error-messages="stuNoError"
             color="orange darken-2"
-            hide-details=""
             placeholder="Enter Student No."
             dense></v-text-field>
         </v-card-text>
@@ -240,6 +240,11 @@ interface studentList {
 export default Vue.extend({
   name: "AddClassView",
   components: { AppBar },
+  watch: {
+    studentNo() {
+      this.stuNoError = "";
+    },
+  },
   methods: {
     onAddStudent() {
       if (this.studentList.every((item) => item.studentNo !== this.studentNo)) {
@@ -251,12 +256,7 @@ export default Vue.extend({
         this.studentName = "";
         this.studentNo = "";
       } else {
-        Toast.fire({
-          icon: "error",
-          position: "top",
-          title: "Student No. already exist",
-        });
-        this.studentNo = "";
+        this.stuNoError = "Student No. already exist";
       }
     },
     onDeleteStudent(index: number) {
@@ -306,6 +306,7 @@ export default Vue.extend({
       endTime: "",
       menuTimeStart: false,
       menuTimeEnd: false,
+      stuNoError: "",
     };
   },
 });
