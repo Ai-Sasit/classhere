@@ -245,7 +245,7 @@ export default Vue.extend({
         });
       });
     api.delete(`/qr/${this.$route.params.id}`).catch(() => {
-      console.log("error");
+      console.log("Do nothing");
     });
   },
   data() {
@@ -326,7 +326,6 @@ export default Vue.extend({
           "class"
         )}`;
         this.auto_status = setInterval(() => {
-          console.log("auto");
           api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
             this.studentList = res.data;
           });

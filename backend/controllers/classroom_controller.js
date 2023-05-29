@@ -17,7 +17,6 @@ module.exports.getOneClassroom = function (req, res) {
 
 module.exports.createClassroom = function (req, res) {
   const { name, number_of_students, students, start, end } = req.body;
-  console.log(req.body);
   prisma.classroom
     .create({
       data: {
