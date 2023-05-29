@@ -90,6 +90,9 @@ export default Vue.extend({
   async mounted() {
     const decoded: Payload = jwt_decode(this.token);
     const { data } = await api.get(`/qr/${decoded.classroom_id}`);
+    // if (res && res.status === 200 && res.data.status === 'ok') {
+      
+    // }
 
     if (
       dayjs(decoded.expired_time).unix() > dayjs(new Date()).unix() &&
