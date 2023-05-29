@@ -118,6 +118,7 @@ const deleteClassroom = async (req, res) => {
     data: null,
   }
   try {
+    // delete classroom where id = req.params.id
     await prisma.classroom.delete({ where: { id: parseInt(req.params.id) } })
     response.status = '[OK] - deleteClassroom'
     response.message = 'success delete classroom'

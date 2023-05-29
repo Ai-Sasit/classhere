@@ -8,7 +8,7 @@ const createQRcodeQuota = async (req, res) => {
     data: null,
   }
   try {
-
+    // insert into qrcode_quota (classroom_id, quota) values (classroom_id, quota)
     await prisma.qrcode_quota.create({ data: { classroom_id: parseInt(classroom_id), quota } })
     response.status = '[OK] - createQRcodeQuota'
     response.message = 'success create qrcode quota'
@@ -68,6 +68,7 @@ const deleteQRcodeQuota = async (req, res) => {
   }
 
   try {
+    // select * from qrcode_quota where classroom_id = id
     const qrcode_quota = await prisma.qrcode_quota.findFirst({ where: { classroom_id: parseInt(req.params.id) } })
     if (!qrcode_quota) {
       response.status = '[ERROR] - deleteQRcodeQuota'
