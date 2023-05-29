@@ -51,7 +51,6 @@ const createClassroom = async (req, res) => {
     if (typeof data === 'string') {
       response.status = '[ERROR] - createClassroom'
       response.message = data
-      res.json(response)
     } else {
       // insert into classroom values (data.classroomOjb)
       const classroom = await prisma.classroom.create({ data: data.classroomObj })
@@ -99,9 +98,8 @@ const updateClassroom = async (req, res) => {
       }
     })
     // create new student
-    await prisma.student.createMany({
-      data: data
-    })
+    await prisma.student.createMany({ data: data })
+
     response.status = '[OK] - updateClassroom'
     response.message = 'success update classroom'
   } catch (err) {
