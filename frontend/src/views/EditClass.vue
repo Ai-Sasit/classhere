@@ -255,7 +255,7 @@ export default Vue.extend({
       .get(`/students?class_id=${this.$route.params.id}`)
       .then((res) => {
         this.loading = false;
-        this.studentList = res.data;
+        this.studentList = res.data.data;
       })
       .catch(() => {
         this.loading = false;
@@ -294,7 +294,8 @@ export default Vue.extend({
       };
       api
         .put(`/classroom/${this.$route.params.id}`, data)
-        .then(() => {
+        .then((res) => {
+          console.log(res);
           this.saving = false;
           swal.fire({
             icon: "success",

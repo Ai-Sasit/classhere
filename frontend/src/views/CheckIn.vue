@@ -236,7 +236,7 @@ export default Vue.extend({
     api
       .get(`/students?class_id=${this.$route.params.id}`)
       .then((res) => {
-        this.studentList = res.data;
+        this.studentList = res.data.data;
       })
       .catch(() => {
         Toast.fire({
@@ -277,7 +277,7 @@ export default Vue.extend({
         api
           .get(`/students?class_id=${this.$route.params.id}`)
           .then((res) => {
-            this.studentList = res.data;
+            this.studentList = res.data.data;
           })
           .catch(() => {
             Toast.fire({
@@ -327,7 +327,7 @@ export default Vue.extend({
         )}`;
         this.auto_status = setInterval(() => {
           api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
-            this.studentList = res.data;
+            this.studentList = res.data.data;
           });
         }, 1000);
       }
@@ -392,7 +392,7 @@ export default Vue.extend({
         api
           .get(`/students?class_id=${this.$route.params.id}`)
           .then((res) => {
-            this.studentList = res.data;
+            this.studentList = res.data.data;
           })
           .catch(() => {
             Toast.fire({
@@ -413,7 +413,7 @@ export default Vue.extend({
           api
             .get(`/students?class_id=${this.$route.params.id}`)
             .then((res) => {
-              this.studentList = res.data;
+              this.studentList = res.data.data;
             })
             .catch(() => {
               Toast.fire({

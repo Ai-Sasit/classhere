@@ -28,7 +28,7 @@ export default {
       }
       api.get(`/qr/${this.$route.params.id}`).then((res) => {
         try {
-          this.quota = res.data.quota;
+          this.quota = res.data.data.quota;
         } catch (err) {
           this.quota = 0;
         }

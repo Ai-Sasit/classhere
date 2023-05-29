@@ -176,7 +176,7 @@ export default Vue.extend({
       .get("/classrooms")
       .then((res) => {
         this.loading = false;
-        this.classrooms = res.data;
+        this.classrooms = res.data.data;
       })
       .catch(() => {
         this.loading = false;

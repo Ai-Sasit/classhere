@@ -12,23 +12,38 @@
       elevation="2"
       style="height: 88vh; width: 90%; margin-top: 1.5rem">
       <v-divider style="margin-bottom: 30vh" />
-      <div class="mx-4" v-if="allow">
-        <h2 style="margin-bottom: 0.5rem">Student No.</h2>
-        <v-text-field
-          outlined
-          style="font-size: large"
-          color="orange darken-2"
-          v-model="no"
-          hide-details=""
-          placeholder="Enter student number"></v-text-field>
-        <div style="text-align: center; margin-top: 1.5rem">
-          <v-btn
+      <div v-if="!loading">
+        <div class="mx-4" v-if="allow">
+          <h2 style="margin-bottom: 0.5rem">Student No.</h2>
+          <v-text-field
+            outlined
+            style="font-size: large"
             color="orange darken-2"
-            style="color: white; font-size: large"
-            large
-            @click="onSubmit"
-            >submit</v-btn
-          >
+            v-model="no"
+            hide-details=""
+            placeholder="Enter student number"></v-text-field>
+          <div style="text-align: center; margin-top: 1.5rem">
+            <v-btn
+              color="orange darken-2"
+              style="color: white; font-size: large"
+              large
+              @click="onSubmit"
+              >submit</v-btn
+            >
+          </div>
+        </div>
+        <div
+          v-else
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+          ">
+          <v-icon large color="red darken-2" style="font-size: 8rem">
+            mdi-cancel
+          </v-icon>
+          <h3>หมดเวลาเช็คชื่อ</h3>
         </div>
       </div>
       <div
@@ -36,13 +51,16 @@
         style="
           display: flex;
           justify-content: center;
-          align-items: center;
           flex-direction: column;
+          align-items: center;
         ">
-        <v-icon large color="red darken-2" style="font-size: 8rem">
-          mdi-cancel
-        </v-icon>
-        <h3>หมดเวลาเช็คชื่อ</h3>
+        <v-progress-circular
+          :size="100"
+          :width="7"
+          color="orange darken-2"
+          indeterminate></v-progress-circular>
+        <br />
+        <h3 style="text-align: center">Checking QR Code</h3>
       </div>
     </v-card>
   </div>
@@ -65,20 +83,24 @@ export default Vue.extend({
     return {
       token: this.$route.params.token,
       allow: false,
+      loading: true,
       no: "",
     };
   },
   async mounted() {
     const decoded: Payload = jwt_decode(this.token);
     const { data } = await api.get(`/qr/${decoded.classroom_id}`);
+
     if (
       dayjs(decoded.expired_time).unix() > dayjs(new Date()).unix() &&
-      data.quota > 0
+      data.data.quota > 0
     ) {
       await api.put(`/qr/${decoded.classroom_id}`);
+      this.loading = false;
       this.allow = true;
     } else {
       await api.delete(`/qr/${decoded.classroom_id}`);
+      this.loading = false;
       this.allow = false;
     }
   },
