@@ -32,7 +32,7 @@ const decrementQRcodeQuota = async (req, res) => {
     // update qrcode_quota set quota = quota - 1 where classroom_id = id
     await prisma.qrcode_quota.update({
       where: { classroom_id: parseInt(req.params.id) },
-      data: { quota: { decrement: 1 } },
+      data: { quota: { decrement: 1 } }
     })
     response.status = 'ok'
     response.message = '[ decrementQRcodeQuota ] - success decrement qrcode quota'

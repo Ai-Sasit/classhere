@@ -25,7 +25,7 @@ const getStudentObjArray = async (students, class_id) => {
     const studentObj = students.map((student) => ({
         name: student.name,
         no: student.studentNo,
-        classroom_id: parseInt(class_id),
+        classroom_id: parseInt(class_id)
     }))
 
     return studentObj
@@ -44,7 +44,7 @@ const getStudentObj = async (student) => {
     const studentObj = {
         name: student.name,
         no: student.studentNo,
-        classroom_id: parseInt(student.classroom_id),
+        classroom_id: parseInt(student.classroom_id)
     }
 
     return studentObj
@@ -62,7 +62,7 @@ const getCheckInOutObj = async (checkInOut) => {
 
     const checkInOutObj = {
         no: checkInOut.no,
-        classroom_id: parseInt(checkInOut.classroom_id),
+        classroom_id: parseInt(checkInOut.classroom_id)
     }
 
     return checkInOutObj

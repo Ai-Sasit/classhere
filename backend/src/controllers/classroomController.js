@@ -74,14 +74,14 @@ const updateClassroom = async (req, res) => {
       // update classroom
       const classroom = await prisma.classroom.update({
         where: { id: parseInt(req.params.id) },
-        data: data.classroomObj,
+        data: data.classroomObj
       })
 
       // delete student 
       await prisma.student.deleteMany({
         where: {
           no: { notIn: data.students.map((student) => student.no) },
-          classroom_id: classroom.id,
+          classroom_id: classroom.id
         }
       })
       // filter new student 
