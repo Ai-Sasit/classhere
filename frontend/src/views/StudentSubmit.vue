@@ -103,12 +103,13 @@ export default Vue.extend({
       if (dayjs(expired_time).unix() > dayjs(new Date()).unix() && quota > 0) {
         // decrease quota
         await api.put(`/qr/${classroom_id}`)
+        this.allow = true
       } else {
         // force delete qr code
         await api.delete(`/qr/${classroom_id}`)
+        this.allow = false
       }
       this.loading = false
-      this.allow = true
     }
   },
   methods: {
