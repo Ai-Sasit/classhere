@@ -10,8 +10,7 @@
     <v-card
       class="mx-auto"
       elevation="2"
-      style="height: 88vh; width: 90%; margin-top: 1.5rem"
-    >
+      style="height: 88vh; width: 90%; margin-top: 1.5rem">
       <v-divider style="margin-bottom: 30vh" />
       <div v-if="!loading">
         <div class="mx-4" v-if="allow">
@@ -22,8 +21,7 @@
             color="orange darken-2"
             v-model="no"
             hide-details=""
-            placeholder="Enter student number"
-          ></v-text-field>
+            placeholder="Enter student number"></v-text-field>
           <div style="text-align: center; margin-top: 1.5rem">
             <v-btn
               color="orange darken-2"
@@ -41,8 +39,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-          "
-        >
+          ">
           <v-icon large color="red darken-2" style="font-size: 8rem">
             mdi-cancel
           </v-icon>
@@ -56,14 +53,12 @@
           justify-content: center;
           flex-direction: column;
           align-items: center;
-        "
-      >
+        ">
         <v-progress-circular
           :size="100"
           :width="7"
           color="orange darken-2"
-          indeterminate
-        ></v-progress-circular>
+          indeterminate></v-progress-circular>
         <br />
         <h3 style="text-align: center">Checking QR Code</h3>
       </div>

@@ -11,8 +11,7 @@
           style="background-color: white !important"
           color="orange"
           label
-          outlined
-        >
+          outlined>
           Total&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
             studentList.length
           }}
@@ -22,8 +21,7 @@
           style="background-color: white !important"
           color="green"
           label
-          outlined
-        >
+          outlined>
           Present&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
             studentList.filter((item) => item.checkin_status).length
           }}
@@ -33,8 +31,7 @@
           style="background-color: white !important"
           color="red"
           label
-          outlined
-        >
+          outlined>
           Absent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
             studentList.filter((item) => !item.checkin_status).length
           }}
@@ -43,15 +40,13 @@
       <v-tabs
         v-model="tab"
         color="orange darken-2"
-        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
-      >
+        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px">
         <v-tab key="QRScan"> QR Scan </v-tab>
         <v-tab key="Manaul"> Manual Check In </v-tab>
       </v-tabs>
       <v-tabs-items
         v-model="tab"
-        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
-      >
+        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px">
         <v-tab-item key="QRScan">
           <v-card color="basil" flat>
             <v-card-text
@@ -72,8 +67,7 @@
                     :key="loopKey"
                     :minutes="minutes"
                     :seconds="seconds"
-                    @finished="onStop"
-                  ></Countdown></v-col
+                    @finished="onStop"></Countdown></v-col
                 ><v-col
                   v-else
                   style="
@@ -104,8 +98,7 @@
                         }"
                         :error-messages="timeError"
                         dense
-                        append-icon="mdi-clock-time-four-outline"
-                      ></v-text-field> </v-col
+                        append-icon="mdi-clock-time-four-outline"></v-text-field> </v-col
                     ><v-col
                       ><v-text-field
                         v-model.number="quota"
@@ -115,8 +108,7 @@
                         :error-messages="quotaError"
                         append-icon="mdi-timer-sand"
                         outlined
-                        placeholder="Enter scanning quota"
-                      ></v-text-field></v-col></v-row
+                        placeholder="Enter scanning quota"></v-text-field></v-col></v-row
                   ><v-row style="margin-top: -1rem"
                     ><v-col
                       ><v-btn
@@ -155,8 +147,7 @@
             <v-simple-table
               style="margin-top: 1rem"
               height="400px"
-              fixed-header
-            >
+              fixed-header>
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -166,8 +157,7 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      "
-                    >
+                      ">
                       Name
                     </th>
                     <th
@@ -176,8 +166,7 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      "
-                    >
+                      ">
                       Student No.
                     </th>
                     <th
@@ -187,8 +176,7 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      "
-                    >
+                      ">
                       Action
                     </th>
                   </tr>
@@ -202,8 +190,7 @@
                         color="orange darken-2"
                         block
                         @click="onClickCheckInOut(item.no, 'checkin')"
-                        style="color: white"
-                      >
+                        style="color: white">
                         Check In
                       </v-btn>
                     </td>

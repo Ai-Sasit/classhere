@@ -18,8 +18,7 @@
           <v-simple-table
             style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
             height="500px"
-            fixed-header
-          >
+            fixed-header>
             <template v-slot:default>
               <thead>
                 <tr>
@@ -29,8 +28,7 @@
                       font-size: medium;
                       background: #263238;
                       color: white;
-                    "
-                  >
+                    ">
                     Classroom
                   </th>
                   <th
@@ -39,8 +37,7 @@
                       font-size: medium;
                       background: #263238;
                       color: white;
-                    "
-                  >
+                    ">
                     Students
                   </th>
                   <th
@@ -49,8 +46,7 @@
                       font-size: medium;
                       background: #263238;
                       color: white;
-                    "
-                  >
+                    ">
                     Start
                   </th>
                   <th
@@ -59,8 +55,7 @@
                       font-size: medium;
                       background: #263238;
                       color: white;
-                    "
-                  >
+                    ">
                     End
                   </th>
                   <th
@@ -69,8 +64,7 @@
                       font-size: medium;
                       background: #263238;
                       color: white;
-                    "
-                  >
+                    ">
                     Ceated At
                   </th>
                   <th
@@ -80,8 +74,7 @@
                       background: #263238;
                       color: white;
                       width: 10rem;
-                    "
-                  >
+                    ">
                     Action
                   </th>
                 </tr>
@@ -100,8 +93,7 @@
                       color="grey darken-3"
                       @click="
                         $router.push(`/check-in/${item.id}?name=${item.name}`)
-                      "
-                    >
+                      ">
                       <v-icon>mdi-eye</v-icon>
                     </v-btn>
                     <v-tooltip bottom v-else>
@@ -110,8 +102,7 @@
                           icon
                           color="grey darken-3"
                           v-on="on"
-                          v-bind="attrs"
-                        >
+                          v-bind="attrs">
                           <v-icon>mdi-eye-off</v-icon>
                         </v-btn>
                       </template>
@@ -124,15 +115,13 @@
                         $router.push(
                           `/edit-class/${item.id}?name=${item.name}&start=${item.start_time}&end=${item.end_time}`
                         )
-                      "
-                    >
+                      ">
                       <v-icon>mdi-layers-edit</v-icon>
                     </v-btn>
                     <v-btn
                       icon
                       color="grey darken-3"
-                      @click="onDeleteClassroom(item.id)"
-                    >
+                      @click="onDeleteClassroom(item.id)">
                       <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </td>
@@ -150,8 +139,7 @@
           <v-progress-linear
             indeterminate
             color="white"
-            class="mb-0"
-          ></v-progress-linear>
+            class="mb-0"></v-progress-linear>
         </v-card-text>
       </v-card>
     </v-dialog>

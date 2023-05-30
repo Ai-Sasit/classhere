@@ -43,8 +43,7 @@
                   :error-messages="nameFieldErrors"
                   v-model="className"
                   placeholder="Enter Classroom Name"
-                  dense
-                ></v-text-field></v-col
+                  dense></v-text-field></v-col
               ><v-col cols="3"
                 ><v-menu
                   ref="menuStart"
@@ -55,8 +54,7 @@
                   transition="scale-transition"
                   offset-y
                   max-width="290px"
-                  min-width="290px"
-                >
+                  min-width="290px">
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
                       v-model="startTime"
@@ -67,8 +65,7 @@
                       append-icon="mdi-clock-time-four-outline"
                       readonly
                       v-bind="attrs"
-                      v-on="on"
-                    ></v-text-field>
+                      v-on="on"></v-text-field>
                   </template>
                   <v-time-picker
                     v-if="menuTimeStart"
@@ -76,8 +73,9 @@
                     full-width
                     color="orange darken-2"
                     format="24hr"
-                    @click:minute="$refs.menuStart?.save(startTime)"
-                  ></v-time-picker> </v-menu></v-col
+                    @click:minute="
+                      $refs.menuStart?.save(startTime)
+                    "></v-time-picker> </v-menu></v-col
               ><v-col cols="3">
                 <v-menu
                   ref="menuEnd"
@@ -88,8 +86,7 @@
                   transition="scale-transition"
                   offset-y
                   max-width="290px"
-                  min-width="290px"
-                >
+                  min-width="290px">
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
                       v-model="endTime"
@@ -100,8 +97,7 @@
                       append-icon="mdi-clock-time-four-outline"
                       readonly
                       v-bind="attrs"
-                      v-on="on"
-                    ></v-text-field>
+                      v-on="on"></v-text-field>
                   </template>
                   <v-time-picker
                     v-if="menuTimeEnd"
@@ -109,8 +105,9 @@
                     color="orange darken-2"
                     full-width
                     format="24hr"
-                    @click:minute="$refs.menuEnd?.save(endTime)"
-                  ></v-time-picker>
+                    @click:minute="
+                      $refs.menuEnd?.save(endTime)
+                    "></v-time-picker>
                 </v-menu> </v-col
             ></v-row>
             <v-row>
@@ -131,8 +128,7 @@
             <v-simple-table
               style="margin-top: 1rem"
               height="350px"
-              fixed-header
-            >
+              fixed-header>
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -142,8 +138,7 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      "
-                    >
+                      ">
                       Name
                     </th>
                     <th
@@ -152,8 +147,7 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      "
-                    >
+                      ">
                       Student No.
                     </th>
                     <th
@@ -163,8 +157,7 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      "
-                    >
+                      ">
                       Action
                     </th>
                   </tr>
@@ -177,8 +170,7 @@
                       <v-btn
                         icon
                         color="grey darken-3"
-                        @click="onDeleteStudent(index)"
-                      >
+                        @click="onDeleteStudent(index)">
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
                     </td>
@@ -212,8 +204,7 @@
             v-model="studentName"
             hide-details=""
             placeholder="Enter Student Name"
-            dense
-          ></v-text-field>
+            dense></v-text-field>
           <br />
           <label>Student No.</label>
           <v-text-field
@@ -222,8 +213,7 @@
             color="orange darken-2"
             :error-messages="stuNoError"
             placeholder="Enter Student No."
-            dense
-          ></v-text-field>
+            dense></v-text-field>
         </v-card-text>
 
         <v-card-actions>
@@ -231,8 +221,7 @@
           <v-btn
             color="orange darken-2"
             style="color: white"
-            @click="onAddStudent"
-          >
+            @click="onAddStudent">
             ADD
           </v-btn>
         </v-card-actions>
@@ -245,8 +234,7 @@
           <v-progress-linear
             indeterminate
             color="white"
-            class="mb-0"
-          ></v-progress-linear>
+            class="mb-0"></v-progress-linear>
         </v-card-text>
       </v-card>
     </v-dialog>
