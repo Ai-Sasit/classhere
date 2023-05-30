@@ -40,7 +40,7 @@
                 ><v-text-field
                   outlined
                   color="orange darken-2"
-                  hide-details=""
+                  :error-messages="nameFieldErrors"
                   v-model="className"
                   placeholder="Enter Classroom Name"
                   dense></v-text-field></v-col
@@ -61,6 +61,7 @@
                       label="Start Time"
                       outlined
                       dense
+                      :error-messages="startTimeFieldErrors"
                       append-icon="mdi-clock-time-four-outline"
                       readonly
                       v-bind="attrs"
@@ -73,7 +74,7 @@
                     color="orange darken-2"
                     format="24hr"
                     @click:minute="
-                      $refs.menuStart.save(startTime)
+                      $refs.menuStart?.save(startTime)
                     "></v-time-picker> </v-menu></v-col
               ><v-col cols="3">
                 <v-menu
@@ -92,6 +93,7 @@
                       label="End Time"
                       outlined
                       dense
+                      :error-messages="endTimeFieldErrors"
                       append-icon="mdi-clock-time-four-outline"
                       readonly
                       v-bind="attrs"
@@ -103,7 +105,9 @@
                     color="orange darken-2"
                     full-width
                     format="24hr"
-                    @click:minute="$refs.menuEnd.save(endTime)"></v-time-picker>
+                    @click:minute="
+                      $refs.menuEnd?.save(endTime)
+                    "></v-time-picker>
                 </v-menu> </v-col
             ></v-row>
             <v-row>
@@ -229,7 +233,6 @@
 import AppBar from "@/components/AppBar.vue";
 import swal from "sweetalert2";
 import { api } from "@/configs/api";
-import { Toast } from "@/configs/api";
 import Vue from "vue";
 
 interface studentList {
@@ -240,60 +243,6 @@ interface studentList {
 export default Vue.extend({
   name: "AddClassView",
   components: { AppBar },
-  watch: {
-    studentNo() {
-      this.stuNoError = "";
-    },
-  },
-  methods: {
-    onAddStudent() {
-      if (this.studentList.every((item) => item.studentNo !== this.studentNo)) {
-        this.dialog = false;
-        this.studentList.push({
-          name: this.studentName,
-          studentNo: this.studentNo,
-        });
-        this.studentName = "";
-        this.studentNo = "";
-      } else {
-        this.stuNoError = "Student No. already exist";
-      }
-    },
-    onDeleteStudent(index: number) {
-      this.studentList.splice(index, 1);
-    },
-    onSaveClassroom() {
-      this.saving = true;
-      const data = {
-        name: this.className,
-        number_of_students: this.studentList.length,
-        students: this.studentList,
-        start: this.startTime,
-        end: this.endTime,
-      };
-      api
-        .post("/classroom", data)
-        .then(() => {
-          this.saving = false;
-          swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "Classroom created successfully",
-            timer: 1500,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          this.$router.push("/");
-        })
-        .catch(() => {
-          this.saving = false;
-          Toast.fire({
-            icon: "error",
-            title: "Something went wrong",
-          });
-        });
-    },
-  },
   data() {
     return {
       dialog: false,
@@ -307,7 +256,66 @@ export default Vue.extend({
       menuTimeStart: false,
       menuTimeEnd: false,
       stuNoError: "",
+      nameFieldErrors: "",
+      startTimeFieldErrors: "",
+      endTimeFieldErrors: "",
     };
+  },
+  watch: {
+    studentNo() {
+      this.stuNoError = "";
+    },
+  },
+  methods: {
+    onDeleteStudent(index: number) {
+      this.studentList.splice(index, 1);
+    },
+    onAddStudent() {
+      const studentNo = this.studentNo;
+      const studentList = this.studentList;
+      // check if student no. already exist
+      if (studentList.some((item) => item.studentNo === studentNo)) {
+        this.stuNoError = "Student No. already exist";
+      } else {
+        this.dialog = false;
+        // add student to list
+        studentList.push({
+          name: this.studentName,
+          studentNo: this.studentNo,
+        });
+        this.studentName = "";
+        this.studentNo = "";
+      }
+    },
+    async onSaveClassroom() {
+      this.saving = true;
+      const data = {
+        name: this.className,
+        number_of_students: this.studentList.length,
+        students: this.studentList,
+        start: this.startTime,
+        end: this.endTime,
+      };
+
+      const res = await api.post("/classroom", data);
+      this.saving = false;
+      if (res && res.status === 200 && res.data.status === "ok") {
+        swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Classroom created successfully",
+          timer: 1200,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+        this.$router.push("/");
+      } else {
+        const err = res.data.errors;
+        this.nameFieldErrors = err.name || "";
+        this.startTimeFieldErrors = err.start || "";
+        this.endTimeFieldErrors = err.end || "";
+      }
+    },
   },
 });
 </script>

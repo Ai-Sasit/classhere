@@ -52,7 +52,7 @@
             <v-card-text
               ><v-row>
                 <v-col
-                  v-if="minutes > 0 || seconds > 0"
+                  v-if="isGenQR"
                   style="
                     display: flex;
                     align-items: center;
@@ -67,7 +67,7 @@
                     :key="loopKey"
                     :minutes="minutes"
                     :seconds="seconds"
-                    @finished="onFinished"></Countdown></v-col
+                    @finished="onStop"></Countdown></v-col
                 ><v-col
                   v-else
                   style="
@@ -124,7 +124,6 @@
                         color="orange darken-2"
                         style="color: white"
                         disabled
-                        @click="onLoopGenerate"
                         >Loop Generate</v-btn
                       ></v-col
                     ><v-col
@@ -190,7 +189,7 @@
                       <v-btn
                         color="orange darken-2"
                         block
-                        @click="onClickCheckIn(item.no)"
+                        @click="onClickCheckInOut(item.no, 'checkin')"
                         style="color: white">
                         Check In
                       </v-btn>
@@ -203,7 +202,7 @@
                             text
                             block
                             v-bind="attrs"
-                            @click="onClickCheckOut(item.no)"
+                            @click="onClickCheckInOut(item.no, 'checkout')"
                             v-on="on"
                             >PRESENT</v-btn
                           >
@@ -224,7 +223,7 @@
 <script>
 import AppBar from "@/components/AppBar.vue";
 import Countdown from "@/components/Countdown.vue";
-import { api, Toast } from "@/configs/api";
+import { api } from "@/configs/api";
 import sign from "jwt-encode";
 import dayjs from "dayjs";
 import { mask } from "@titou10/v-mask";
@@ -232,24 +231,9 @@ import Vue from "vue";
 export default Vue.extend({
   components: { AppBar, Countdown },
   directives: { mask },
-  mounted() {
-    api
-      .get(`/students?class_id=${this.$route.params.id}`)
-      .then((res) => {
-        this.studentList = res.data.data;
-      })
-      .catch(() => {
-        Toast.fire({
-          icon: "error",
-          title: "Something went wrong!",
-        });
-      });
-    api.delete(`/qr/${this.$route.params.id}`).catch(() => {
-      console.log("Do nothing");
-    });
-  },
   data() {
     return {
+      class_id: this.$route.params.id,
       tab: null,
       menu2: false,
       studentList: [],
@@ -263,7 +247,13 @@ export default Vue.extend({
       auto_status: 0,
       timeError: "",
       quotaError: "",
+      isGenQR: false,
     };
+  },
+  async mounted() {
+    await this.updateStudentList();
+    // clear qr in db
+    await api.delete(`/qr/${this.class_id}`);
   },
   watch: {
     time() {
@@ -272,35 +262,28 @@ export default Vue.extend({
     quota() {
       this.quotaError = "";
     },
-    tab(newValue) {
+    async tab(newValue) {
       if (newValue == 1) {
-        api
-          .get(`/students?class_id=${this.$route.params.id}`)
-          .then((res) => {
-            this.studentList = res.data.data;
-          })
-          .catch(() => {
-            Toast.fire({
-              icon: "error",
-              title: "Something went wrong!",
-            });
-          });
+        await this.updateStudentList();
       }
     },
   },
   methods: {
-    onGenerate() {
-      if (this.time == "" && this.quota == "") {
+    async updateStudentList() {
+      const res = await api.get(`/students?class_id=${this.class_id}`);
+      if (res && res.status == 200 && res.data.status == "ok") {
+        this.studentList = res.data.data;
+      }
+    },
+    async onGenerate() {
+      if (this.time == "") {
         this.timeError = "Please enter time";
-        this.quotaError = "Please enter quota";
-      } else if (this.time == "") {
-        this.timeError = "Please enter time";
-      } else if (this.quota == "") {
-        this.quotaError = "Please enter quota";
-      } else if (this.timeError !== "Invalid time format") {
-        const minuteAndSecond = this.time.split(":");
-        this.minutes = parseInt(minuteAndSecond[0]);
-        this.seconds = parseInt(minuteAndSecond[1]);
+      } else {
+        // get countdown time
+        const [minutes, seconds] = this.time.split(":");
+        this.minutes = parseInt(minutes);
+        this.seconds = parseInt(seconds);
+        // get expired time
         const date = dayjs(new Date())
           .add(this.minutes, "minute")
           .add(this.seconds, "second")
@@ -310,125 +293,41 @@ export default Vue.extend({
           expired_time: date,
           quota: this.quota,
         };
-        api
-          .post("/qr", {
-            quota: this.quota,
-            classroom_id: this.$route.params.id,
-          })
-          .catch(() => {
-            Toast.fire({
-              icon: "error",
-              title: "Something went wrong!",
-            });
-          });
-        this.qr_data = `https://aiz-app-demo.web.app/student-submit/${sign(
-          payload,
-          "class"
-        )}`;
-        this.auto_status = setInterval(() => {
-          api.get(`/students?class_id=${this.$route.params.id}`).then((res) => {
-            this.studentList = res.data.data;
-          });
-        }, 1000);
+        const res = await api.post("/qr", payload);
+        if (res && res.status === 200 && res.data.status === "ok") {
+          this.isGenQR = true;
+          // generate token for sequrity
+          const token = sign(payload, "class");
+          this.qr_data = `https://aiz-app-demo.web.app/student-submit/${token}`;
+          // auto update student list
+          this.auto_status = setInterval(this.updateStudentList, 1000);
+        } else {
+          const err = res.data.errors;
+          this.quotaError = err.quota || "";
+        }
       }
     },
-    onLoopGenerate() {
-      this.isLoop = true;
-      this.loopKey = dayjs(new Date()).unix();
-      const minuteAndSecond = this.time.split(":");
-      this.minutes = parseInt(minuteAndSecond[0]);
-      this.seconds = parseInt(minuteAndSecond[1]);
-      const date = dayjs(new Date())
-        .add(this.minutes, "minute")
-        .add(this.seconds, "second")
-        .format("YYYY-MM-DD HH:mm:ss");
-      const payload = {
-        classroom_id: this.$route.params.id,
-        expired_time: date,
-        quota: this.quota,
-      };
-      this.qr_data = `https://aiz-app-demo.web.app/student-submit/${sign(
-        payload,
-        "class"
-      )}`;
-    },
-    onStop() {
+    async onStop() {
       this.minutes = 0;
       this.seconds = 0;
+      // stop auto update student list
       clearInterval(this.auto_status);
-      api
-        .delete(`/qr/${this.$route.params.id}`)
-        .then(() => {
-          window.location.reload();
-        })
-        .catch(() => {
-          Toast.fire({
-            icon: "error",
-            title: "Something went wrong!",
-          });
-        });
-    },
-    onFinished() {
-      if (this.isLoop) {
-        this.onLoopGenerate();
-      } else {
-        this.minutes = 0;
-        this.seconds = 0;
-        api.delete(`/qr/${this.$route.params.id}`).catch(() => {
-          Toast.fire({
-            icon: "error",
-            title: "Something went wrong!",
-          });
-        });
-        clearInterval(this.auto_status);
+      const res = await api.delete(`/qr/${this.class_id}`);
+      if (res && res.status === 200 && res.data.status === "ok") {
+        window.location.reload();
       }
     },
-    onClickCheckIn(student_no) {
+    async onClickCheckInOut(student_no, route) {
       const payload = {
-        classroom_id: this.$route.params.id,
+        classroom_id: this.class_id,
         no: student_no,
       };
-      api.post("checkin", payload).then(() => {
-        api
-          .get(`/students?class_id=${this.$route.params.id}`)
-          .then((res) => {
-            this.studentList = res.data.data;
-          })
-          .catch(() => {
-            Toast.fire({
-              icon: "error",
-              title: "Something went wrong!",
-            });
-          });
-      });
+      const res = await api.post(route, payload);
+      if (res && res.status === 200 && res.data.status === "ok") {
+        await this.updateStudentList();
+      }
     },
-    onClickCheckOut(student_no) {
-      const payload = {
-        classroom_id: this.$route.params.id,
-        no: student_no,
-      };
-      api
-        .post("checkout", payload)
-        .then(() => {
-          api
-            .get(`/students?class_id=${this.$route.params.id}`)
-            .then((res) => {
-              this.studentList = res.data.data;
-            })
-            .catch(() => {
-              Toast.fire({
-                icon: "error",
-                title: "Something went wrong!",
-              });
-            });
-        })
-        .catch(() => {
-          Toast.fire({
-            icon: "error",
-            title: "Something went wrong!",
-          });
-        });
-    },
+    // for testing
     goToStudent() {
       window.location.href = this.qr_data;
     },

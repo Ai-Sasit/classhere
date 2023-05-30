@@ -149,7 +149,6 @@
 <script lang="ts">
 import AppBar from "@/components/AppBar.vue";
 import { api } from "@/configs/api";
-import { Toast } from "@/configs/api";
 import swal from "sweetalert2";
 import dayjs from "dayjs";
 import Vue from "vue";
@@ -171,79 +170,63 @@ export default Vue.extend({
       dayjs,
     };
   },
-  mounted() {
-    api
-      .get("/classrooms")
-      .then((res) => {
-        this.loading = false;
-        this.classrooms = res.data.data;
-      })
-      .catch(() => {
-        this.loading = false;
-        Toast.fire({
-          icon: "error",
-          title: "Something went wrong!",
-        });
-      });
-  },
   data() {
     return {
       classrooms: [] as Classroom[],
       loading: true,
     };
   },
+  async mounted() {
+    const res = await api.get("/classrooms");
+    this.loading = false;
+    if (res && res.status === 200 && res.data.status === "ok") {
+      this.classrooms = res.data.data;
+    }
+  },
   methods: {
-    onDeleteClassroom(id: number) {
-      swal
-        .fire({
-          title: "Are you sure?",
-          text: "You won't be able to revert this!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#ff9800",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Yes, delete it!",
-        })
-        .then((result) => {
-          if (result.isConfirmed) {
-            api
-              .delete(`/classroom/${id}`)
-              .then(() => {
-                swal.fire({
-                  title: "Deleted!",
-                  text: "Your classroom has been deleted.",
-                  icon: "success",
-                  timer: 1500,
-                  focusConfirm: false,
-                  showConfirmButton: false,
-                  timerProgressBar: true,
-                });
+    async onDeleteClassroom(id: number) {
+      const result = await swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ff9800",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
 
-                this.classrooms = this.classrooms.filter(
-                  (item) => item.id !== id
-                );
-              })
-              .catch(() => {
-                Toast.fire({
-                  icon: "error",
-                  title: "Something went wrong!",
-                });
-              });
-          }
-        });
+      if (result.isConfirmed) {
+        const res = await api.delete(`/classroom/${id}`);
+
+        if (res && res.status === 200 && res.data.status === "ok") {
+          swal.fire({
+            title: "Deleted!",
+            text: "Your classroom has been deleted.",
+            icon: "success",
+            timer: 1200,
+            focusConfirm: false,
+            showConfirmButton: false,
+            timerProgressBar: true,
+          });
+
+          this.classrooms = this.classrooms.filter((item) => item.id !== id);
+        }
+      }
     },
+    // check if current time is between start and end time for specific classroom
     isBetweenTime(start: string, end: string) {
       const hr1 = parseInt(start.split(":")[0]);
       const hr2 = parseInt(end.split(":")[0]);
       const now = dayjs();
       const date = now.format("YYYY-MM-DD");
       if (hr1 > hr2) {
-        const startTime = dayjs(
-          `${now.subtract(1, "day").format("YYYY-MM-DD")} ${start}`
-        );
+        // if start time is greater than end time, then it's a night class
+        const startDateTime = now.subtract(1, "day").format("YYYY-MM-DD");
+        const startTime = dayjs(`${startDateTime} ${start}`);
         const endTime = dayjs(`${date} ${end}`);
         return now.isBetween(startTime, endTime);
       } else {
+        // if start time is less than end time, then it's a day class
         const startTime = dayjs(`${date} ${start}`);
         const endTime = dayjs(`${date} ${end}`);
         return now.isBetween(startTime, endTime);

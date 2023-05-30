@@ -20,19 +20,19 @@ export default {
     };
   },
   methods: {
-    tick() {
+    async tick() {
       this.timeLeft--;
       if (this.timeLeft <= 0) {
         this.$emit("finished");
         clearInterval(this.interval);
       }
-      api.get(`/qr/${this.$route.params.id}`).then((res) => {
-        try {
-          this.quota = res.data.data.quota;
-        } catch (err) {
-          this.quota = 0;
-        }
-      });
+      // auto refresh quota
+      const res = await api.get(`/qr/${this.$route.params.id}`);
+      if (res && res.status === 200 && res.data.status === "ok") {
+        this.quota = res.data.data.quota;
+      } else {
+        this.quota = 0;
+      }
     },
   },
   mounted() {

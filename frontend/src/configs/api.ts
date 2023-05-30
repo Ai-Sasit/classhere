@@ -3,43 +3,33 @@ import Swal from "sweetalert2";
 
 const api = axios.create({
   baseURL: "https://delicate-glitter-1822.fly.dev/api",
-})
-
-api.interceptors.response.use(
-  response => {
-      if (response && response.data.status === 'error') {
-        console.log(response)
-        
-          // Vue.notify({
-          //     title: 'error--header',
-          //     text: 'error---text',
-          //     type: 'error'
-          // })
-      }
-      return response
-  },
-  function (error) {
-      if (error && error.response && error.response.status === 500) {
-        console.log(error.response)
-      } else if (error && error.response && error.response.status === 408) {
-        console.log(error.response)
-      }
-  }
-)
-
-const Toast = Swal.mixin({
-  toast: true,
-  position: "top-end",
-  showConfirmButton: false,
-  timer: 3000,
-  timerProgressBar: true,
-  didOpen: (toast) => {
-    toast.addEventListener("mouseenter", Swal.stopTimer);
-    toast.addEventListener("mouseleave", Swal.resumeTimer);
-  },
 });
 
-export {
-  api,
-  Toast
-}
+api.interceptors.response.use(
+  (response) => {
+    if (response) {
+      if (
+        response.data.status === "error" ||
+        response.data.status === "errors"
+      ) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: response.data.message,
+          confirmButtonColor: "#4A148C",
+          focusConfirm: false,
+        });
+      }
+    }
+    return response;
+  },
+  function (error) {
+    if (error && error.response && error.response.status === 500) {
+      console.log(error.response);
+    } else if (error && error.response && error.response.status === 408) {
+      console.log(error.response);
+    }
+  }
+);
+
+export { api };

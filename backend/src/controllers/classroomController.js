@@ -2,55 +2,49 @@ const prisma = require('../connection')
 const constants = require('../utils/constants')
 
 const getAllsClassroom = async (req, res) => {
-  const response = {
-    status: '',
-    message: '',
-    data: null,
-  }
+  const response = {}
   try {
     // select * from classroom  
     const classrooms = await prisma.classroom.findMany()
-    response.status = '[OK] - getAllsClassroom'
-    response.message = 'success get all classroom'
+    response.status = 'ok'
+    response.message = '[ getAllsClassroom  ] - success get all classroom'
     response.data = classrooms
   } catch (err) {
-    response.status = '[ERROR] - getAllsClassroom'
-    response.message = err.message
+    response.status = 'error'
+    response.message = `[ getAllsClassroom ] - ${err.message}`
   }
   res.json(response)
 }
 
 const getOneClassroom = async (req, res) => {
   const conditions = { where: { id: parseInt(req.params.id) } }
-  const response = {
-    status: '',
-    message: '',
-    data: null,
-  }
+  const response = {}
   try {
     // select * from classroom where id = conditions
     const classroom = await prisma.classroom.findUnique(conditions)
-    response.status = '[OK] - getOneClassroom'
-    response.message = 'success get one classroom'
-    response.data = classroom
+    if (!classroom) {
+      response.status = 'errors'
+      response.message = '[ getOneClassroom ] - classroom not found'
+    } else {
+      response.status = 'ok'
+      response.message = '[ getOneClassroom ] - success get one classroom'
+      response.data = classroom
+    }
   } catch (err) {
-    response.status = '[ERROR] - getOneClassroom'
-    response.message = err.message
+    response.status = 'error'
+    response.message = `[ getOneClassroom ] - ${err.message}`
   }
   res.json(response)
 }
 
 const createClassroom = async (req, res) => {
   const data = await constants.getClassroomObj(req.body)
-  const response = {
-    status: '',
-    message: '',
-    data: null,
-  }
+  const response = {}
   try {
-    if (typeof data === 'string') {
-      response.status = '[ERROR] - createClassroom'
-      response.message = data
+    if (data.err) {
+      delete data.err
+      response.status = 'error_inputs'
+      response.errors = data
     } else {
       // insert into classroom values (data.classroomOjb)
       const classroom = await prisma.classroom.create({ data: data.classroomObj })
@@ -58,71 +52,71 @@ const createClassroom = async (req, res) => {
       const students = await constants.getStudentObjArray(data.students, classroom.id)
       // insert into student values (students)
       await prisma.student.createMany({ data: students })
-      response.status = '[OK] - createClassroom'
-      response.message = 'success create classroom'
+      response.status = 'ok'
+      response.message = '[ createClassroom ] - success create classroom'
     }
   } catch (err) {
-    response.status = '[ERROR] - createClassroom'
-    response.message = err.message
+    response.status = 'error'
+    response.message = `[ createClassroom ] - ${err.message}`
   }
   res.json(response)
 }
 
 const updateClassroom = async (req, res) => {
-  const { classroomObj, students } = await constants.getClassroomObj(req.body)
-  const response = {
-    status: '',
-    message: '',
-    data: null,
-  }
+  const data = await constants.getClassroomObj(req.body)
+  const response = {}
   try {
-    // update classroom
-    const classroom = await prisma.classroom.update({
-      where: { id: parseInt(req.params.id) },
-      data: classroomObj,
-    })
-    // delete student 
-    await prisma.student.deleteMany({
-      where: {
-        no: { notIn: students.map((student) => student.no) },
-        classroom_id: classroom.id,
-      }
-    })
-    // filter new student 
-    const newStudent = students.filter((student) => student.id === undefined)
-    const data = newStudent.map((student) => {
-      return {
-        name: student.name,
-        no: student.no,
-        classroom_id: classroom.id,
-      }
-    })
-    // create new student
-    await prisma.student.createMany({ data: data })
+    if (data.err) {
+      delete data.err
+      response.status = 'error_inputs'
+      response.errors = data
+    } else {
+      // update classroom
+      const classroom = await prisma.classroom.update({
+        where: { id: parseInt(req.params.id) },
+        data: data.classroomObj,
+      })
 
-    response.status = '[OK] - updateClassroom'
-    response.message = 'success update classroom'
+      // delete student 
+      await prisma.student.deleteMany({
+        where: {
+          no: { notIn: data.students.map((student) => student.no) },
+          classroom_id: classroom.id,
+        }
+      })
+      // filter new student 
+      const newStudent = data.students.filter((student) => student.id === undefined)
+      const newStu = newStudent.map((student) => {
+        return {
+          name: student.name,
+          no: student.no,
+          classroom_id: classroom.id,
+        }
+      })
+      // create new student
+      await prisma.student.createMany({ data: newStu })
+
+      response.status = 'ok'
+      response.message = '[ updateClassroom ] - success update classroom'
+
+    }
   } catch (err) {
-    response.status = '[ERROR] - updateClassroom'
-    response.message = err.message
+    response.status = 'error'
+    response.message = `[ updateClassroom ] - ${err.message}`
   }
   res.json(response)
 }
 
 const deleteClassroom = async (req, res) => {
-  const response = {
-    status: '',
-    message: '',
-    data: null,
-  }
+  const response = {}
   try {
     // delete classroom where id = req.params.id
     await prisma.classroom.delete({ where: { id: parseInt(req.params.id) } })
-    response.status = '[OK] - deleteClassroom'
-    response.message = 'success delete classroom'
+    response.status = 'ok'
+    response.message = '[ deleteClassroom ] - success delete classroom'
   } catch (err) {
-    response.status = '[ERROR] - deleteClassroom'
-    response.message = err.message
+    response.status = 'error'
+    response.message = `[ deleteClassroom ] - ${err.message}`
   }
   res.json(response)
 }

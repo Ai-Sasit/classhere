@@ -69,7 +69,7 @@
 import Vue from "vue";
 import jwt_decode from "jwt-decode";
 import dayjs from "dayjs";
-import { api, Toast } from "@/configs/api";
+import { api } from "@/configs/api";
 import Swal from "sweetalert2";
 
 interface Payload {
@@ -88,50 +88,43 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    const decoded: Payload = jwt_decode(this.token);
-    const { data } = await api.get(`/qr/${decoded.classroom_id}`);
-    // if (res && res.status === 200 && res.data.status === 'ok') {
-      
-    // }
-
-    if (
-      dayjs(decoded.expired_time).unix() > dayjs(new Date()).unix() &&
-      data.data.quota > 0
-    ) {
-      await api.put(`/qr/${decoded.classroom_id}`);
+    // decode token from qr code
+    const { classroom_id, expired_time }: Payload = jwt_decode(this.token);
+    // get qr code quota data
+    const res = await api.get(`/qr/${classroom_id}`);
+    if (res && res.status === 200 && res.data.status === "ok") {
+      const { quota } = res.data.data;
+      // check if expired time is not expired and quota is not 0
+      if (dayjs(expired_time).unix() > dayjs(new Date()).unix() && quota > 0) {
+        // decrease quota
+        await api.put(`/qr/${classroom_id}`);
+      } else {
+        // force delete qr code
+        await api.delete(`/qr/${classroom_id}`);
+      }
       this.loading = false;
       this.allow = true;
-    } else {
-      await api.delete(`/qr/${decoded.classroom_id}`);
-      this.loading = false;
-      this.allow = false;
     }
   },
   methods: {
-    onSubmit() {
+    async onSubmit() {
       const decoded: Payload = jwt_decode(this.token);
       const payload = {
         no: this.no,
         classroom_id: decoded.classroom_id,
       };
-      api
-        .post("/checkin", payload)
-        .then(() => {
-          Swal.fire({
-            title: "Success",
-            text: "Check in success",
-            icon: "success",
-            confirmButtonText: "OK",
-          }).then(() => {
-            window.location.href = "https://www.google.com";
-          });
-        })
-        .catch(() => {
-          Toast.fire({
-            icon: "error",
-            title: "Something went wrong!",
-          });
+      // send check in request
+      const res = await api.post("/checkin", payload);
+      if (res && res.status === 200 && res.data.status === "ok") {
+        Swal.fire({
+          title: "Success",
+          text: "Check in success",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.close();
         });
+      }
     },
   },
 });
