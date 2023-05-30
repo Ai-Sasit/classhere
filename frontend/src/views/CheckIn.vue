@@ -11,7 +11,8 @@
           style="background-color: white !important"
           color="orange"
           label
-          outlined>
+          outlined
+        >
           Total&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
             studentList.length
           }}
@@ -21,7 +22,8 @@
           style="background-color: white !important"
           color="green"
           label
-          outlined>
+          outlined
+        >
           Present&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
             studentList.filter((item) => item.checkin_status).length
           }}
@@ -31,7 +33,8 @@
           style="background-color: white !important"
           color="red"
           label
-          outlined>
+          outlined
+        >
           Absent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
             studentList.filter((item) => !item.checkin_status).length
           }}
@@ -40,13 +43,15 @@
       <v-tabs
         v-model="tab"
         color="orange darken-2"
-        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px">
+        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
+      >
         <v-tab key="QRScan"> QR Scan </v-tab>
         <v-tab key="Manaul"> Manual Check In </v-tab>
       </v-tabs>
       <v-tabs-items
         v-model="tab"
-        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px">
+        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
+      >
         <v-tab-item key="QRScan">
           <v-card color="basil" flat>
             <v-card-text
@@ -67,7 +72,8 @@
                     :key="loopKey"
                     :minutes="minutes"
                     :seconds="seconds"
-                    @finished="onStop"></Countdown></v-col
+                    @finished="onStop"
+                  ></Countdown></v-col
                 ><v-col
                   v-else
                   style="
@@ -93,12 +99,13 @@
                           mask: '$#:$#',
                           tokens: {
                             $: { pattern: /[0-5]/ },
-                            '#': { pattern: /[0-9]/ },
-                          },
+                            '#': { pattern: /[0-9]/ }
+                          }
                         }"
                         :error-messages="timeError"
                         dense
-                        append-icon="mdi-clock-time-four-outline"></v-text-field> </v-col
+                        append-icon="mdi-clock-time-four-outline"
+                      ></v-text-field> </v-col
                     ><v-col
                       ><v-text-field
                         v-model.number="quota"
@@ -108,7 +115,8 @@
                         :error-messages="quotaError"
                         append-icon="mdi-timer-sand"
                         outlined
-                        placeholder="Enter scanning quota"></v-text-field></v-col></v-row
+                        placeholder="Enter scanning quota"
+                      ></v-text-field></v-col></v-row
                   ><v-row style="margin-top: -1rem"
                     ><v-col
                       ><v-btn
@@ -147,7 +155,8 @@
             <v-simple-table
               style="margin-top: 1rem"
               height="400px"
-              fixed-header>
+              fixed-header
+            >
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -157,7 +166,8 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      ">
+                      "
+                    >
                       Name
                     </th>
                     <th
@@ -166,7 +176,8 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      ">
+                      "
+                    >
                       Student No.
                     </th>
                     <th
@@ -176,7 +187,8 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      ">
+                      "
+                    >
                       Action
                     </th>
                   </tr>
@@ -190,7 +202,8 @@
                         color="orange darken-2"
                         block
                         @click="onClickCheckInOut(item.no, 'checkin')"
-                        style="color: white">
+                        style="color: white"
+                      >
                         Check In
                       </v-btn>
                     </td>
@@ -221,13 +234,13 @@
   </div>
 </template>
 <script>
-import AppBar from "@/components/AppBar.vue";
-import Countdown from "@/components/Countdown.vue";
-import { api } from "@/configs/api";
-import sign from "jwt-encode";
-import dayjs from "dayjs";
-import { mask } from "@titou10/v-mask";
-import Vue from "vue";
+import AppBar from '@/components/AppBar.vue'
+import Countdown from '@/components/Countdown.vue'
+import { api } from '@/configs/api'
+import sign from 'jwt-encode'
+import dayjs from 'dayjs'
+import { mask } from '@titou10/v-mask'
+import Vue from 'vue'
 export default Vue.extend({
   components: { AppBar, Countdown },
   directives: { mask },
@@ -238,99 +251,99 @@ export default Vue.extend({
       menu2: false,
       studentList: [],
       isLoop: false,
-      time: "",
-      quota: "",
+      time: '',
+      quota: '',
       minutes: 0,
       seconds: 0,
       loopKey: 0,
-      qr_data: "",
+      qr_data: '',
       auto_status: 0,
-      timeError: "",
-      quotaError: "",
-      isGenQR: false,
-    };
+      timeError: '',
+      quotaError: '',
+      isGenQR: false
+    }
   },
   async mounted() {
-    await this.updateStudentList();
+    await this.updateStudentList()
     // clear qr in db
-    await api.delete(`/qr/${this.class_id}`);
+    await api.delete(`/qr/${this.class_id}`)
   },
   watch: {
     time() {
-      this.timeError = "";
+      this.timeError = ''
     },
     quota() {
-      this.quotaError = "";
+      this.quotaError = ''
     },
     async tab(newValue) {
       if (newValue == 1) {
-        await this.updateStudentList();
+        await this.updateStudentList()
       }
-    },
+    }
   },
   methods: {
     async updateStudentList() {
-      const res = await api.get(`/students?class_id=${this.class_id}`);
-      if (res && res.status == 200 && res.data.status == "ok") {
-        this.studentList = res.data.data;
+      const res = await api.get(`/students?class_id=${this.class_id}`)
+      if (res && res.status == 200 && res.data.status == 'ok') {
+        this.studentList = res.data.data
       }
     },
     async onGenerate() {
-      if (this.time == "") {
-        this.timeError = "Please enter time";
+      if (this.time == '') {
+        this.timeError = 'Please enter time'
       } else {
         // get countdown time
-        const [minutes, seconds] = this.time.split(":");
-        this.minutes = parseInt(minutes);
-        this.seconds = parseInt(seconds);
+        const [minutes, seconds] = this.time.split(':')
+        this.minutes = parseInt(minutes)
+        this.seconds = parseInt(seconds)
         // get expired time
         const date = dayjs(new Date())
-          .add(this.minutes, "minute")
-          .add(this.seconds, "second")
-          .format("YYYY-MM-DD HH:mm:ss");
+          .add(this.minutes, 'minute')
+          .add(this.seconds, 'second')
+          .format('YYYY-MM-DD HH:mm:ss')
         const payload = {
           classroom_id: this.$route.params.id,
           expired_time: date,
-          quota: this.quota,
-        };
-        const res = await api.post("/qr", payload);
-        if (res && res.status === 200 && res.data.status === "ok") {
-          this.isGenQR = true;
+          quota: this.quota
+        }
+        const res = await api.post('/qr', payload)
+        if (res && res.status === 200 && res.data.status === 'ok') {
+          this.isGenQR = true
           // generate token for sequrity
-          const token = sign(payload, "class");
-          this.qr_data = `https://aiz-app-demo.web.app/student-submit/${token}`;
+          const token = sign(payload, 'class')
+          this.qr_data = `https://aiz-app-demo.web.app/student-submit/${token}`
           // auto update student list
-          this.auto_status = setInterval(this.updateStudentList, 1000);
+          this.auto_status = setInterval(this.updateStudentList, 1000)
         } else {
-          const err = res.data.errors;
-          this.quotaError = err.quota || "";
+          const err = res.data.errors
+          this.quotaError = err.quota || ''
         }
       }
     },
     async onStop() {
-      this.minutes = 0;
-      this.seconds = 0;
+      this.minutes = 0
+      this.seconds = 0
       // stop auto update student list
-      clearInterval(this.auto_status);
-      const res = await api.delete(`/qr/${this.class_id}`);
-      if (res && res.status === 200 && res.data.status === "ok") {
-        window.location.reload();
+      clearInterval(this.auto_status)
+      const res = await api.delete(`/qr/${this.class_id}`)
+      if (res && res.status === 200 && res.data.status === 'ok') {
+        window.location.reload()
       }
     },
     async onClickCheckInOut(student_no, route) {
       const payload = {
         classroom_id: this.class_id,
-        no: student_no,
-      };
-      const res = await api.post(route, payload);
-      if (res && res.status === 200 && res.data.status === "ok") {
-        await this.updateStudentList();
+        no: student_no
+      }
+      const res = await api.post(route, payload)
+      if (res && res.status === 200 && res.data.status === 'ok') {
+        await this.updateStudentList()
       }
     },
     // for testing
     goToStudent() {
-      window.location.href = this.qr_data;
-    },
-  },
-});
+      window.location.href = this.qr_data
+    }
+  }
+})
 </script>

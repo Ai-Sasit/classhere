@@ -15,5 +15,10 @@
   },
   "devDependencies": {
     "prisma": "4.7.1"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "none"
   }
 }

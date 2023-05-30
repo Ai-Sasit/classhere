@@ -9,19 +9,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import isBetween from "dayjs/plugin/isBetween";
-import dayjs from "dayjs";
+import Vue from 'vue'
+import isBetween from 'dayjs/plugin/isBetween'
+import dayjs from 'dayjs'
 export default Vue.extend({
-  name: "App",
+  name: 'App',
   setup() {
-    dayjs.extend(isBetween);
-  },
-});
+    dayjs.extend(isBetween)
+  }
+})
 </script>
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Kanit&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
 html * {
-  font-family: "Kanit" !important;
+  font-family: 'Kanit' !important;
 }
 </style>

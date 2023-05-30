@@ -4,7 +4,7 @@ const constants = require('../utils/constants')
 const getAllsClassroom = async (req, res) => {
   const response = {}
   try {
-    // select * from classroom  
+    // select * from classroom
     const classrooms = await prisma.classroom.findMany()
     response.status = 'ok'
     response.message = '[ getAllsClassroom  ] - success get all classroom'
@@ -47,9 +47,14 @@ const createClassroom = async (req, res) => {
       response.errors = data
     } else {
       // insert into classroom values (data.classroomOjb)
-      const classroom = await prisma.classroom.create({ data: data.classroomObj })
+      const classroom = await prisma.classroom.create({
+        data: data.classroomObj
+      })
       // get student object array with classroom id
-      const students = await constants.getStudentObjArray(data.students, classroom.id)
+      const students = await constants.getStudentObjArray(
+        data.students,
+        classroom.id
+      )
       // insert into student values (students)
       await prisma.student.createMany({ data: students })
       response.status = 'ok'
@@ -77,20 +82,22 @@ const updateClassroom = async (req, res) => {
         data: data.classroomObj
       })
 
-      // delete student 
+      // delete student
       await prisma.student.deleteMany({
         where: {
           no: { notIn: data.students.map((student) => student.no) },
           classroom_id: classroom.id
         }
       })
-      // filter new student 
-      const newStudent = data.students.filter((student) => student.id === undefined)
+      // filter new student
+      const newStudent = data.students.filter(
+        (student) => student.id === undefined
+      )
       const newStu = newStudent.map((student) => {
         return {
           name: student.name,
           no: student.no,
-          classroom_id: classroom.id,
+          classroom_id: classroom.id
         }
       })
       // create new student
@@ -98,7 +105,6 @@ const updateClassroom = async (req, res) => {
 
       response.status = 'ok'
       response.message = '[ updateClassroom ] - success update classroom'
-
     }
   } catch (err) {
     response.status = 'error'
@@ -126,5 +132,5 @@ module.exports = {
   deleteClassroom,
   getOneClassroom,
   createClassroom,
-  updateClassroom,
+  updateClassroom
 }

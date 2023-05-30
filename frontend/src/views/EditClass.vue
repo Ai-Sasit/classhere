@@ -43,7 +43,8 @@
                   :error-messages="nameFieldErrors"
                   v-model="className"
                   placeholder="Enter Classroom Name"
-                  dense></v-text-field></v-col
+                  dense
+                ></v-text-field></v-col
               ><v-col cols="3"
                 ><v-menu
                   ref="menuStart"
@@ -54,7 +55,8 @@
                   transition="scale-transition"
                   offset-y
                   max-width="290px"
-                  min-width="290px">
+                  min-width="290px"
+                >
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
                       v-model="startTime"
@@ -65,7 +67,8 @@
                       append-icon="mdi-clock-time-four-outline"
                       readonly
                       v-bind="attrs"
-                      v-on="on"></v-text-field>
+                      v-on="on"
+                    ></v-text-field>
                   </template>
                   <v-time-picker
                     v-if="menuTimeStart"
@@ -73,9 +76,8 @@
                     full-width
                     color="orange darken-2"
                     format="24hr"
-                    @click:minute="
-                      $refs.menuStart?.save(startTime)
-                    "></v-time-picker> </v-menu></v-col
+                    @click:minute="$refs.menuStart?.save(startTime)"
+                  ></v-time-picker> </v-menu></v-col
               ><v-col cols="3">
                 <v-menu
                   ref="menuEnd"
@@ -86,7 +88,8 @@
                   transition="scale-transition"
                   offset-y
                   max-width="290px"
-                  min-width="290px">
+                  min-width="290px"
+                >
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
                       v-model="endTime"
@@ -97,7 +100,8 @@
                       append-icon="mdi-clock-time-four-outline"
                       readonly
                       v-bind="attrs"
-                      v-on="on"></v-text-field>
+                      v-on="on"
+                    ></v-text-field>
                   </template>
                   <v-time-picker
                     v-if="menuTimeEnd"
@@ -105,9 +109,8 @@
                     color="orange darken-2"
                     full-width
                     format="24hr"
-                    @click:minute="
-                      $refs.menuEnd?.save(endTime)
-                    "></v-time-picker>
+                    @click:minute="$refs.menuEnd?.save(endTime)"
+                  ></v-time-picker>
                 </v-menu> </v-col
             ></v-row>
             <v-row>
@@ -128,7 +131,8 @@
             <v-simple-table
               style="margin-top: 1rem"
               height="350px"
-              fixed-header>
+              fixed-header
+            >
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -138,7 +142,8 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      ">
+                      "
+                    >
                       Name
                     </th>
                     <th
@@ -147,7 +152,8 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      ">
+                      "
+                    >
                       Student No.
                     </th>
                     <th
@@ -157,7 +163,8 @@
                         font-size: medium;
                         background: #263238;
                         color: white;
-                      ">
+                      "
+                    >
                       Action
                     </th>
                   </tr>
@@ -170,7 +177,8 @@
                       <v-btn
                         icon
                         color="grey darken-3"
-                        @click="onDeleteStudent(index)">
+                        @click="onDeleteStudent(index)"
+                      >
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
                     </td>
@@ -204,7 +212,8 @@
             v-model="studentName"
             hide-details=""
             placeholder="Enter Student Name"
-            dense></v-text-field>
+            dense
+          ></v-text-field>
           <br />
           <label>Student No.</label>
           <v-text-field
@@ -213,7 +222,8 @@
             color="orange darken-2"
             :error-messages="stuNoError"
             placeholder="Enter Student No."
-            dense></v-text-field>
+            dense
+          ></v-text-field>
         </v-card-text>
 
         <v-card-actions>
@@ -221,7 +231,8 @@
           <v-btn
             color="orange darken-2"
             style="color: white"
-            @click="onAddStudent">
+            @click="onAddStudent"
+          >
             ADD
           </v-btn>
         </v-card-actions>
@@ -234,25 +245,26 @@
           <v-progress-linear
             indeterminate
             color="white"
-            class="mb-0"></v-progress-linear>
+            class="mb-0"
+          ></v-progress-linear>
         </v-card-text>
       </v-card>
     </v-dialog>
   </div>
 </template>
 <script lang="ts">
-import AppBar from "@/components/AppBar.vue";
-import swal from "sweetalert2";
-import { api } from "@/configs/api";
-import Vue from "vue";
+import AppBar from '@/components/AppBar.vue'
+import swal from 'sweetalert2'
+import { api } from '@/configs/api'
+import Vue from 'vue'
 
 interface studentList {
-  name: string;
-  no: string;
+  name: string
+  no: string
 }
 
 export default Vue.extend({
-  name: "AddClassView",
+  name: 'AddClassView',
   components: { AppBar },
   data() {
     return {
@@ -262,75 +274,75 @@ export default Vue.extend({
       endTime: this.$route.query.end as string,
       dialog: false,
       loading: true,
-      studentName: "",
-      studentNo: "",
+      studentName: '',
+      studentNo: '',
       studentList: [] as studentList[],
       saving: false,
       menuTimeStart: false,
       menuTimeEnd: false,
-      stuNoError: "",
-      nameFieldErrors: "",
-      startTimeFieldErrors: "",
-      endTimeFieldErrors: "",
-    };
+      stuNoError: '',
+      nameFieldErrors: '',
+      startTimeFieldErrors: '',
+      endTimeFieldErrors: ''
+    }
   },
   async mounted() {
-    const res = await api.get(`/students?class_id=${this.class_id}`);
-    this.loading = false;
-    if (res && res.status === 200 && res.data.status === "ok") {
-      this.studentList = res.data.data;
+    const res = await api.get(`/students?class_id=${this.class_id}`)
+    this.loading = false
+    if (res && res.status === 200 && res.data.status === 'ok') {
+      this.studentList = res.data.data
     }
   },
   methods: {
     onDeleteStudent(index: number) {
-      this.studentList.splice(index, 1);
+      this.studentList.splice(index, 1)
     },
     onAddStudent() {
-      const studentNo = this.studentNo;
-      const studentList = this.studentList;
+      const studentNo = this.studentNo
+      const studentList = this.studentList
       // check if student no. already exist
       if (studentList.some((item) => item.no === studentNo)) {
-        this.stuNoError = "Student No. already exist";
+        this.stuNoError = 'Student No. already exist'
       } else {
-        this.dialog = false;
+        this.dialog = false
         // add student to list
         studentList.push({
           name: this.studentName,
-          no: this.studentNo,
-        });
-        this.studentName = "";
-        this.studentNo = "";
+          no: this.studentNo
+        })
+        this.studentName = ''
+        this.studentNo = ''
       }
     },
     async onSaveClassroom() {
-      this.saving = true;
+      this.saving = true
       const data = {
         name: this.className,
         number_of_students: this.studentList.length,
         students: this.studentList,
         start: this.startTime,
-        end: this.endTime,
-      };
+        end: this.endTime
+      }
 
-      const res = await api.put(`/classroom/${this.class_id}`, data);
-      this.saving = false;
-      if (res && res.status === 200 && res.data.status === "ok") {
+      const res = await api.put(`/classroom/${this.class_id}`, data)
+      this.saving = false
+      if (res && res.status === 200 && res.data.status === 'ok') {
         swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Classroom has been updated",
+          icon: 'success',
+          title: 'Success',
+          text: 'Classroom has been updated',
           timer: 1200,
           timerProgressBar: true,
-          showConfirmButton: false,
-        });
-        this.$router.push("/");
+          showConfirmButton: false
+        })
+        this.$router.push('/')
       } else {
-        const err = res.data.errors;
-        this.nameFieldErrors = err.name || "";
-        this.startTimeFieldErrors = err.start || "";
-        this.endTimeFieldErrors = err.end || "";
+        const err = res.data.errors
+        this.nameFieldErrors = err.name || ''
+        this.startTimeFieldErrors = err.start || ''
+        this.endTimeFieldErrors = err.end || ''
       }
-    },
-  },
-});
+    }
+  }
+})
 </script>

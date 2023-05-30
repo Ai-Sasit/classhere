@@ -7,9 +7,12 @@ const getAllsStudent = async (req, res) => {
     const class_id = req.query.class_id
     if (class_id) {
       // select * from student where classroom_id = class_id
-      const students = await prisma.student.findMany({ where: { classroom_id: parseInt(class_id) } })
+      const students = await prisma.student.findMany({
+        where: { classroom_id: parseInt(class_id) }
+      })
       response.status = 'ok'
-      response.message = '[ getAllsStudent ] - success get all student by class id'
+      response.message =
+        '[ getAllsStudent ] - success get all student by class id'
       response.data = students
     } else {
       // select * from student
@@ -29,7 +32,9 @@ const getOneStudent = async (req, res) => {
   const response = {}
   try {
     // select * from student where id = id
-    const student = await prisma.student.findUnique({ where: { id: parseInt(req.params.id) } })
+    const student = await prisma.student.findUnique({
+      where: { id: parseInt(req.params.id) }
+    })
     response.status = 'ok'
     response.message = '[ getAllsStudent ] - success get one student'
     response.data = student
@@ -71,7 +76,10 @@ const updateStudent = async (req, res) => {
       response.errors = data
     } else {
       // update student set name = data.name, no = data.no, classroom_id = data.classroom_id where id = data.id
-      await prisma.student.update({ where: { id: parseInt(req.params.id) }, data })
+      await prisma.student.update({
+        where: { id: parseInt(req.params.id) },
+        data
+      })
       response.status = 'ok'
       response.message = '[ updateStudent ] - success update student'
     }
@@ -109,7 +117,10 @@ const checkInStudent = async (req, res) => {
     const student = await prisma.student.findFirst({ where: conditions })
     if (student) {
       // update student set checkin_status = true where id = student.id
-      await prisma.student.update({ where: { id: student.id }, data: { checkin_status: true } })
+      await prisma.student.update({
+        where: { id: student.id },
+        data: { checkin_status: true }
+      })
       response.status = 'ok'
       response.message = '[ checkInStudent ] - success checkin student'
     } else {
@@ -121,7 +132,6 @@ const checkInStudent = async (req, res) => {
     response.message = `[ checkInStudent ] -  ${err.message}`
   }
   res.json(response)
-
 }
 const checkOutStudent = async (req, res) => {
   const response = {}
@@ -136,7 +146,10 @@ const checkOutStudent = async (req, res) => {
     const student = await prisma.student.findFirst({ where: conditions })
     if (student) {
       // update student set checkin_status = true where id = student.id
-      await prisma.student.update({ where: { id: student.id }, data: { checkin_status: false } })
+      await prisma.student.update({
+        where: { id: student.id },
+        data: { checkin_status: false }
+      })
       response.status = 'ok'
       response.message = '[ checkOutStudent ] - success checkout student'
     } else {
