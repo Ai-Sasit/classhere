@@ -2,23 +2,30 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 
 const api = axios.create({
-  baseURL: 'https://delicate-glitter-1822.fly.dev/api'
+  baseURL: 'https://delicate-glitter-1822.fly.dev/api',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  }
 })
 
 api.interceptors.response.use(
-  (response) => {
+  async (response) => {
     if (response) {
       if (
         response.data.status === 'error' ||
         response.data.status === 'errors'
       ) {
-        Swal.fire({
+        const result = await Swal.fire({
           icon: 'error',
           title: 'Oops...',
           text: response.data.message,
           confirmButtonColor: '#4A148C',
           focusConfirm: false
         })
+        if (result.isConfirmed) {
+          window.location.reload()
+        }
       }
     }
     return response
@@ -32,4 +39,15 @@ api.interceptors.response.use(
   }
 )
 
-export { api }
+const SwalSuccess = (message: string) => {
+  Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: message,
+    timer: 1200,
+    timerProgressBar: true,
+    showConfirmButton: false
+  })
+}
+
+export { api, SwalSuccess }

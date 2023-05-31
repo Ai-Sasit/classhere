@@ -1,106 +1,65 @@
 <template>
   <div>
-    <AppBar />
     <v-container>
-      <div style="margin-top: 1rem; display: flex; flex-direction: row">
+      <div class="checkin-title">
         <v-col>
           <h1>{{ $route.query.name }}</h1>
         </v-col>
-        <v-chip
-          class="ma-2 mt-6"
-          style="background-color: white !important"
-          color="orange"
-          label
-          outlined>
-          Total&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
-            studentList.length
-          }}
-        </v-chip>
-        <v-chip
-          class="ma-2 mt-6"
-          style="background-color: white !important"
-          color="green"
-          label
-          outlined>
-          Present&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
-            studentList.filter((item) => item.checkin_status).length
-          }}
-        </v-chip>
-        <v-chip
-          class="ma-2 mt-6"
-          style="background-color: white !important"
-          color="red"
-          label
-          outlined>
-          Absent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{
-            studentList.filter((item) => !item.checkin_status).length
-          }}
-        </v-chip>
+        <div class="chip-monitor-student chip-orange mr-3">
+          <span>Total</span><span>{{ studentList.length }}</span>
+        </div>
+        <div class="chip-monitor-student chip-green mr-3">
+          <span>Present</span><span>{{ present }}</span>
+        </div>
+        <div class="chip-monitor-student chip-red">
+          <span>Absent</span><span>{{ absent }}</span>
+        </div>
       </div>
-      <v-tabs
-        v-model="tab"
-        color="orange darken-2"
-        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px">
+      <v-tabs v-model="tab" color="orange darken-2" class="shadow">
         <v-tab key="QRScan"> QR Scan </v-tab>
         <v-tab key="Manaul"> Manual Check In </v-tab>
       </v-tabs>
-      <v-tabs-items
-        v-model="tab"
-        style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px">
+      <v-tabs-items v-model="tab" class="shadow">
         <v-tab-item key="QRScan">
           <v-card color="basil" flat>
-            <v-card-text
-              ><v-row>
-                <v-col
-                  v-if="isGenQR"
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-direction: column;
-                  "
-                  ><img
-                    style="margin-top: 2rem"
+            <v-card-text>
+              <v-row>
+                <v-col v-if="isGenQR" class="show-qr">
+                  <img
+                    class="mt-2"
                     @click="goToStudent"
                     :src="`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${qr_data}`" /><br />
                   <Countdown
                     :key="loopKey"
                     :minutes="minutes"
                     :seconds="seconds"
-                    @finished="onStop"></Countdown></v-col
-                ><v-col
-                  v-else
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-direction: column;
-                  "
-                  ><img
-                    src="https://png.pngtree.com/png-vector/20221013/ourmid/pngtree-calendar-icon-logo-2023-date-time-png-image_6310337.png" /></v-col
-                ><v-col
-                  ><v-row style="margin-top: 4rem"
-                    ><v-col style="padding-bottom: 0">Expired Time</v-col
-                    ><v-col style="padding-bottom: 0">Quota</v-col></v-row
-                  ><v-row
-                    ><v-col>
+                    @finished="onStop">
+                  </Countdown>
+                </v-col>
+                <v-col v-else class="show-qr">
+                  <img
+                    src="https://png.pngtree.com/png-vector/20221013/ourmid/pngtree-calendar-icon-logo-2023-date-time-png-image_6310337.png" />
+                </v-col>
+                <v-col>
+                  <v-row style="margin-top: 4rem">
+                    <v-col class="pb-0">Expired Time</v-col>
+                    <v-col class="pb-0">Quota</v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
                       <v-text-field
                         v-model="time"
                         placeholder="Enter Expired Time (MM:SS)"
                         outlined
                         color="orange darken-2"
-                        v-mask="{
-                          mask: '$#:$#',
-                          tokens: {
-                            $: { pattern: /[0-5]/ },
-                            '#': { pattern: /[0-9]/ }
-                          }
-                        }"
+                        v-mask="mask"
                         :error-messages="timeError"
                         dense
-                        append-icon="mdi-clock-time-four-outline"></v-text-field> </v-col
-                    ><v-col
-                      ><v-text-field
+                        append-icon="mdi-clock-time-four-outline">
+                      </v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field
                         v-model.number="quota"
                         v-mask="'###'"
                         color="orange darken-2"
@@ -108,38 +67,38 @@
                         :error-messages="quotaError"
                         append-icon="mdi-timer-sand"
                         outlined
-                        placeholder="Enter scanning quota"></v-text-field></v-col></v-row
-                  ><v-row style="margin-top: -1rem"
-                    ><v-col
-                      ><v-btn
+                        placeholder="Enter scanning quota">
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row style="margin-top: -1rem">
+                    <v-col>
+                      <v-btn
                         block
-                        color="orange darken-2"
                         style="color: white"
-                        @click="onGenerate"
-                        >Generate</v-btn
-                      ></v-col
-                    ><v-col
-                      ><v-btn
-                        block
                         color="orange darken-2"
-                        style="color: white"
-                        disabled
-                        >Loop Generate</v-btn
-                      ></v-col
-                    ><v-col
-                      ><v-btn
+                        @click="onGenerate">
+                        Generate
+                      </v-btn>
+                    </v-col>
+                    <v-col>
+                      <v-btn block color="orange darken-2" disabled>
+                        Loop Generate
+                      </v-btn>
+                    </v-col>
+                    <v-col>
+                      <v-btn
                         block
                         outlined
                         @click="onStop"
-                        color="orange darken-2"
-                        style="color: white"
-                        >Stop</v-btn
-                      ></v-col
-                    ></v-row
-                  ></v-col
-                ></v-row
-              ></v-card-text
-            >
+                        color="orange darken-2">
+                        Stop
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-card-text>
           </v-card>
         </v-tab-item>
         <v-tab-item key="Manaul">
@@ -151,32 +110,9 @@
               <template v-slot:default>
                 <thead>
                   <tr>
-                    <th
-                      class="text-left"
-                      style="
-                        font-size: medium;
-                        background: #263238;
-                        color: white;
-                      ">
-                      Name
-                    </th>
-                    <th
-                      class="text-left"
-                      style="
-                        font-size: medium;
-                        background: #263238;
-                        color: white;
-                      ">
-                      Student No.
-                    </th>
-                    <th
-                      class="text-center"
-                      style="
-                        width: 10rem;
-                        font-size: medium;
-                        background: #263238;
-                        color: white;
-                      ">
+                    <th class="text-left table-header">Name</th>
+                    <th class="text-left table-header">Student No.</th>
+                    <th class="text-center table-header" style="width: 10rem">
                       Action
                     </th>
                   </tr>
@@ -203,9 +139,9 @@
                             block
                             v-bind="attrs"
                             @click="onClickCheckInOut(item.no, 'checkout')"
-                            v-on="on"
-                            >PRESENT</v-btn
-                          >
+                            v-on="on">
+                            PRESENT
+                          </v-btn>
                         </template>
                         <span>Reset</span>
                       </v-tooltip>
@@ -221,7 +157,6 @@
   </div>
 </template>
 <script>
-import AppBar from '@/components/AppBar.vue'
 import Countdown from '@/components/Countdown.vue'
 import { api } from '@/configs/api'
 import sign from 'jwt-encode'
@@ -229,7 +164,7 @@ import dayjs from 'dayjs'
 import { mask } from '@titou10/v-mask'
 import Vue from 'vue'
 export default Vue.extend({
-  components: { AppBar, Countdown },
+  components: { Countdown },
   directives: { mask },
   data() {
     return {
@@ -247,13 +182,28 @@ export default Vue.extend({
       auto_status: 0,
       timeError: '',
       quotaError: '',
-      isGenQR: false
+      isGenQR: false,
+      mask: {
+        mask: '$#:$#',
+        tokens: {
+          $: { pattern: /[0-5]/ },
+          '#': { pattern: /[0-9]/ }
+        }
+      }
     }
   },
   async mounted() {
     await this.updateStudentList()
     // clear qr in db
     await api.delete(`/qr/${this.class_id}`)
+  },
+  computed: {
+    present() {
+      return this.studentList.filter((item) => item.checkin_status).length
+    },
+    absent() {
+      return this.studentList.filter((item) => !item.checkin_status).length
+    }
   },
   watch: {
     time() {

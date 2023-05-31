@@ -10,6 +10,10 @@ app.use(cors())
 
 app.use('/api', indexRoute)
 
+app.get('/', (req, res) => {
+  res.send({ healthCheck: 'ok' })
+})
+
 app.listen(process.env.PORT, () =>
   console.log(`
 🚀 Server ready at: http://localhost:${process.env.PORT}`)

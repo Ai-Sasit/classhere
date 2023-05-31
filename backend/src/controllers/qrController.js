@@ -71,7 +71,7 @@ const deleteQRcodeQuota = async (req, res) => {
       where: { classroom_id: parseInt(req.params.id) }
     })
     if (!qrcode_quota) {
-      response.status = 'errors'
+      response.status = 'errors illigal'
       response.message = '[ deleteQRcodeQuota ] - qrcode quota not found'
     } else {
       // delete from qrcode_quota where classroom_id = id

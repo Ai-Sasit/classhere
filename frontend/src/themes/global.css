@@ -1,0 +1,63 @@
+.layout-btn-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.table-header {
+  font-size: medium !important;
+  background: #263238 !important;
+  color: white !important;
+}
+
+.show-qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.shadow {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px !important;
+}
+
+.chip-monitor-student {
+  background-color: white !important;
+  display: flex;
+  margin-top: 1rem;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 2px;
+  border-radius: 3.5px;
+  width: 7rem;
+  height: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+.chip-orange {
+  color: peru;
+  border: 2px solid peru;
+}
+
+.chip-green {
+  color: green;
+  border: 2px solid green;
+}
+
+.chip-red {
+  color: red;
+  border: 2px solid red;
+}
+
+.checkin-title {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.btn-add {
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+}

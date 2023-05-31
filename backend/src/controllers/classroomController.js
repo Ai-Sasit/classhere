@@ -1,7 +1,7 @@
 const prisma = require('../connection')
-const constants = require('../utils/constants')
+const helper = require('../utils/helper')
 
-const getAllsClassroom = async (req, res) => {
+const getAllClassroom = async (req, res) => {
   const response = {}
   try {
     // select * from classroom
@@ -16,7 +16,7 @@ const getAllsClassroom = async (req, res) => {
   res.json(response)
 }
 
-const getOneClassroom = async (req, res) => {
+const getClassroom = async (req, res) => {
   const conditions = { where: { id: parseInt(req.params.id) } }
   const response = {}
   try {
@@ -38,7 +38,7 @@ const getOneClassroom = async (req, res) => {
 }
 
 const createClassroom = async (req, res) => {
-  const data = await constants.getClassroomObj(req.body)
+  const data = await helper.getClassroomObj(req.body)
   const response = {}
   try {
     if (data.err) {
@@ -46,17 +46,18 @@ const createClassroom = async (req, res) => {
       response.status = 'error_inputs'
       response.errors = data
     } else {
-      // insert into classroom values (data.classroomOjb)
-      const classroom = await prisma.classroom.create({
-        data: data.classroomObj
+      await prisma.$transaction(async (tx) => {
+        // create classroom
+        const classroom = await tx.classroom.create({
+          data: data.classroomObj
+        })
+        // create students
+        const students = await helper.getStudentObjArray(
+          data.students,
+          classroom.id
+        )
+        await tx.student.createMany({ data: students })
       })
-      // get student object array with classroom id
-      const students = await constants.getStudentObjArray(
-        data.students,
-        classroom.id
-      )
-      // insert into student values (students)
-      await prisma.student.createMany({ data: students })
       response.status = 'ok'
       response.message = '[ createClassroom ] - success create classroom'
     }
@@ -68,7 +69,8 @@ const createClassroom = async (req, res) => {
 }
 
 const updateClassroom = async (req, res) => {
-  const data = await constants.getClassroomObj(req.body)
+  const data = await helper.getClassroomObj(req.body)
+  const id = parseInt(req.params.id)
   const response = {}
   try {
     if (data.err) {
@@ -76,33 +78,28 @@ const updateClassroom = async (req, res) => {
       response.status = 'error_inputs'
       response.errors = data
     } else {
-      // update classroom
-      const classroom = await prisma.classroom.update({
-        where: { id: parseInt(req.params.id) },
-        data: data.classroomObj
-      })
-
-      // delete student
-      await prisma.student.deleteMany({
-        where: {
-          no: { notIn: data.students.map((student) => student.no) },
-          classroom_id: classroom.id
-        }
-      })
       // filter new student
       const newStudent = data.students.filter(
         (student) => student.id === undefined
       )
-      const newStu = newStudent.map((student) => {
-        return {
-          name: student.name,
-          no: student.no,
-          classroom_id: classroom.id
-        }
-      })
-      // create new student
-      await prisma.student.createMany({ data: newStu })
+      const newStu = await helper.getStudentObjArray(newStudent, id)
 
+      await prisma.$transaction(async (tx) => {
+        // update classroom
+        await tx.classroom.update({
+          where: { id: parseInt(req.params.id) },
+          data: data.classroomObj
+        })
+        // delete students
+        await tx.student.deleteMany({
+          where: {
+            no: { notIn: data.students.map((student) => student.no) },
+            classroom_id: id
+          }
+        })
+        // create new students
+        await tx.student.createMany({ data: newStu })
+      })
       response.status = 'ok'
       response.message = '[ updateClassroom ] - success update classroom'
     }
@@ -128,9 +125,9 @@ const deleteClassroom = async (req, res) => {
 }
 
 module.exports = {
-  getAllsClassroom,
+  getAllClassroom,
   deleteClassroom,
-  getOneClassroom,
+  getClassroom,
   createClassroom,
   updateClassroom
 }

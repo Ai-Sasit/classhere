@@ -1,20 +1,15 @@
 <template>
   <div>
-    <v-app-bar dense dark style="display: flex; justify-content: center">
-      <v-toolbar-title
-        ><b
-          >CLASS<span style="color: sandybrown">HERE</span></b
-        ></v-toolbar-title
-      >
+    <v-app-bar dense dark class="app-bar">
+      <v-toolbar-title>
+        <b>CLASS<span class="half-text-app-bar">HERE</span></b>
+      </v-toolbar-title>
     </v-app-bar>
-    <v-card
-      class="mx-auto"
-      elevation="2"
-      style="height: 88vh; width: 90%; margin-top: 1.5rem">
+    <v-card class="mx-auto main-card" elevation="2">
       <v-divider style="margin-bottom: 30vh" />
       <div v-if="!loading">
         <div class="mx-4" v-if="allow">
-          <h2 style="margin-bottom: 0.5rem">Student No.</h2>
+          <h2 class="mb-1">Student No.</h2>
           <v-text-field
             outlined
             style="font-size: large"
@@ -22,45 +17,31 @@
             v-model="no"
             hide-details=""
             placeholder="Enter student number"></v-text-field>
-          <div style="text-align: center; margin-top: 1.5rem">
+          <div class="btn-section">
             <v-btn
               color="orange darken-2"
-              style="color: white; font-size: large"
+              class="btn-style"
               large
-              @click="onSubmit"
-              >submit</v-btn
-            >
+              @click="onSubmit">
+              submit
+            </v-btn>
           </div>
         </div>
-        <div
-          v-else
-          style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-          ">
+        <div v-else class="card-layout">
           <v-icon large color="red darken-2" style="font-size: 8rem">
             mdi-cancel
           </v-icon>
           <h3>หมดเวลาเช็คชื่อ</h3>
         </div>
       </div>
-      <div
-        v-else
-        style="
-          display: flex;
-          justify-content: center;
-          flex-direction: column;
-          align-items: center;
-        ">
+      <div v-else class="card-layout">
         <v-progress-circular
           :size="100"
           :width="7"
           color="orange darken-2"
           indeterminate></v-progress-circular>
         <br />
-        <h3 style="text-align: center">Checking QR Code</h3>
+        <h3 class="text-center">Checking QR Code</h3>
       </div>
     </v-card>
   </div>
@@ -130,3 +111,31 @@ export default Vue.extend({
   }
 })
 </script>
+<style scoped>
+.app-bar {
+  display: flex;
+  justify-content: center;
+}
+.half-text-app-bar {
+  color: sandybrown;
+}
+.main-card {
+  height: 88vh;
+  width: 90%;
+  margin-top: 1.5rem;
+}
+.btn-section {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+.btn-style {
+  color: white;
+  font-size: large;
+}
+.card-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+</style>

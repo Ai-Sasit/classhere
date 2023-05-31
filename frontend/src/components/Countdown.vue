@@ -1,3 +1,9 @@
+<template>
+  <div style="padding-bottom: 2rem">
+    <h2 style="color: red">Expired In : {{ formattedTimeLeft }}</h2>
+    <h3 style="color: orange">Quota : {{ quota }} left</h3>
+  </div>
+</template>
 <script>
 import { api } from '@/configs/api'
 export default {
@@ -53,10 +59,3 @@ export default {
   }
 }
 </script>
-
-<template>
-  <div style="padding-bottom: 2rem">
-    <h2 style="color: red">Expired In : {{ formattedTimeLeft }}</h2>
-    <h3 style="color: orange">Quota : {{ quota }} left</h3>
-  </div>
-</template>

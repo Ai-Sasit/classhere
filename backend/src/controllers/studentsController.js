@@ -1,7 +1,7 @@
 const prisma = require('../connection')
-const constants = require('../utils/constants')
+const constants = require('../utils/helper')
 
-const getAllsStudent = async (req, res) => {
+const getAllStudent = async (req, res) => {
   const response = {}
   try {
     const class_id = req.query.class_id
@@ -28,7 +28,7 @@ const getAllsStudent = async (req, res) => {
   res.json(response)
 }
 
-const getOneStudent = async (req, res) => {
+const getStudent = async (req, res) => {
   const response = {}
   try {
     // select * from student where id = id
@@ -164,8 +164,8 @@ const checkOutStudent = async (req, res) => {
 }
 
 module.exports = {
-  getAllsStudent,
-  getOneStudent,
+  getAllStudent,
+  getStudent,
   createStudent,
   updateStudent,
   deleteStudent,

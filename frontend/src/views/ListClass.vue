@@ -1,80 +1,29 @@
 <template>
   <div>
-    <AppBar />
     <v-container>
-      <v-row style="margin-top: 1rem"
-        ><v-col><h1>Classroom</h1></v-col
-        ><v-col style="display: flex; align-items: center; justify-content: end"
-          ><v-btn
+      <v-row class="mt-4">
+        <v-col><h1>Classroom</h1></v-col>
+        <v-col class="layout-btn-col">
+          <v-btn
             color="orange darken-3"
             style="color: white"
-            @click="$router.push('/add-class')"
-            >NEW CLASSROOM</v-btn
-          ></v-col
-        ></v-row
-      >
+            @click="$router.push('/add-class')">
+            NEW CLASSROOM
+          </v-btn>
+        </v-col>
+      </v-row>
       <v-row>
         <v-col>
-          <v-simple-table
-            style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
-            height="500px"
-            fixed-header>
+          <v-simple-table class="shadow" height="500px" fixed-header>
             <template v-slot:default>
               <thead>
                 <tr>
-                  <th
-                    style="
-                      text-align: left;
-                      font-size: medium;
-                      background: #263238;
-                      color: white;
-                    ">
-                    Classroom
-                  </th>
-                  <th
-                    style="
-                      text-align: left;
-                      font-size: medium;
-                      background: #263238;
-                      color: white;
-                    ">
-                    Students
-                  </th>
-                  <th
-                    style="
-                      text-align: left;
-                      font-size: medium;
-                      background: #263238;
-                      color: white;
-                    ">
-                    Start
-                  </th>
-                  <th
-                    style="
-                      text-align: left;
-                      font-size: medium;
-                      background: #263238;
-                      color: white;
-                    ">
-                    End
-                  </th>
-                  <th
-                    style="
-                      text-align: left;
-                      font-size: medium;
-                      background: #263238;
-                      color: white;
-                    ">
-                    Ceated At
-                  </th>
-                  <th
-                    style="
-                      text-align: center;
-                      font-size: medium;
-                      background: #263238;
-                      color: white;
-                      width: 10rem;
-                    ">
+                  <th class="table-header text-left">Classroom</th>
+                  <th class="table-header text-left">Students</th>
+                  <th class="table-header text-left">Start</th>
+                  <th class="table-header text-left">End</th>
+                  <th class="table-header text-left">Ceated At</th>
+                  <th class="table-header text-left" style="width: 10rem">
                     Action
                   </th>
                 </tr>
@@ -86,7 +35,7 @@
                   <td>{{ item.start_time }}</td>
                   <td>{{ item.end_time }}</td>
                   <td>{{ dayjs(item.created_at).format('YYYY-MM-DD') }}</td>
-                  <td style="text-align: center">
+                  <td class="text-center">
                     <v-btn
                       v-if="isBetweenTime(item.start_time, item.end_time)"
                       icon
@@ -128,30 +77,21 @@
                 </tr>
               </tbody>
             </template>
-          </v-simple-table></v-col
-        >
-      </v-row></v-container
-    >
-    <v-dialog v-model="loading" hide-overlay persistent width="300">
-      <v-card color="orange darken-2" dark>
-        <v-card-text>
-          Please stand by
-          <v-progress-linear
-            indeterminate
-            color="white"
-            class="mb-0"></v-progress-linear>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+          </v-simple-table>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <LoadingModal :loading="loading" />
   </div>
 </template>
 
 <script lang="ts">
-import AppBar from '@/components/AppBar.vue'
-import { api } from '@/configs/api'
+import { SwalSuccess, api } from '@/configs/api'
 import swal from 'sweetalert2'
 import dayjs from 'dayjs'
 import Vue from 'vue'
+import LoadingModal from '@/components/LoadingModal.vue'
 
 interface Classroom {
   id: number
@@ -164,7 +104,6 @@ interface Classroom {
 
 export default Vue.extend({
   name: 'ListClassView',
-  components: { AppBar },
   setup() {
     return {
       dayjs
@@ -194,21 +133,10 @@ export default Vue.extend({
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, delete it!'
       })
-
       if (result.isConfirmed) {
         const res = await api.delete(`/classroom/${id}`)
-
         if (res && res.status === 200 && res.data.status === 'ok') {
-          swal.fire({
-            title: 'Deleted!',
-            text: 'Your classroom has been deleted.',
-            icon: 'success',
-            timer: 1200,
-            focusConfirm: false,
-            showConfirmButton: false,
-            timerProgressBar: true
-          })
-
+          SwalSuccess('Classroom deleted successfully')
           this.classrooms = this.classrooms.filter((item) => item.id !== id)
         }
       }
@@ -232,7 +160,8 @@ export default Vue.extend({
         return now.isBetween(startTime, endTime)
       }
     }
-  }
+  },
+  components: { LoadingModal }
 })
 </script>
 <style></style>
